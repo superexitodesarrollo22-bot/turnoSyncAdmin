@@ -1,0 +1,443 @@
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    ScrollView,
+    TouchableOpacity,
+    RefreshControl,
+    Dimensions,
+    Image,
+    Platform,
+    Animated as NativeAnimated
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { supabase } from '../../config/supabase';
+import { useAuth } from '../../hooks/useAuth';
+import { formatCurrency, getLongDate } from '../../utils/helpers';
+import { Appointment } from '../../types';
+
+const { width } = Dimensions.get('window');
+
+// --- Componentes Skeleton Nativos ---
+const SkeletonItem = ({ style }: { style: any }) => {
+    const opacity = useRef(new NativeAnimated.Value(0.3)).current;
+
+    useEffect(() => {
+        NativeAnimated.loop(
+            NativeAnimated.sequence([
+                NativeAnimated.timing(opacity, { toValue: 0.7, duration: 1000, useNativeDriver: true }),
+                NativeAnimated.timing(opacity, { toValue: 0.3, duration: 1000, useNativeDriver: true }),
+            ])
+        ).start();
+    }, []);
+
+    return <NativeAnimated.View style={[styles.skeleton, style, { opacity }]} />;
+};
+
+const DashboardSkeleton = () => (
+    <View style={styles.skeletonContainer}>
+        <View style={styles.kpiGrid}>
+            {[1, 2, 3, 4].map((i) => (
+                <SkeletonItem key={i} style={styles.kpiCardSkeleton} />
+            ))}
+        </View>
+        <SkeletonItem style={styles.weeklyCardSkeleton} />
+        <SkeletonItem style={styles.titleSkeleton} />
+        {[1, 2, 3, 4, 5].map((i) => (
+            <SkeletonItem key={i} style={styles.listSkeleton} />
+        ))}
+    </View>
+);
+
+// --- Pantalla Principal ---
+const DashboardScreen = () => {
+    const navigation = useNavigation<any>();
+    const { business, userProfile, signOut } = useAuth();
+
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [stats, setStats] = useState({
+        todayTotal: 0,
+        todayPending: 0,
+        todayCompleted: 0,
+        todayCancelled: 0,
+        weekCount: 0,
+        weekRevenue: 0,
+        weekOccupancy: 0,
+    });
+    const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([]);
+    const [greeting, setGreeting] = useState('');
+    const [onboardingStatus, setOnboardingStatus] = useState<string | null>(null);
+    const [needsConfig, setNeedsConfig] = useState({ services: false, schedules: false });
+
+    // Animación de entrada de la pantalla
+    const screenOpacity = useRef(new NativeAnimated.Value(0)).current;
+
+    const fetchDashboardData = useCallback(async () => {
+        if (!business) return;
+
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            const now = new Date().toISOString();
+
+            // 1. KPIs del Día
+            const { data: appointmentsToday } = await supabase
+                .from('appointments')
+                .select('id, status, price_cents')
+                .eq('business_id', business.id)
+                .gte('start_at', `${today}T00:00:00.000Z`)
+                .lte('start_at', `${today}T23:59:59.999Z`);
+
+            const todayStats = {
+                total: appointmentsToday?.length || 0,
+                pending: appointmentsToday?.filter(a => a.status === 'pending').length || 0,
+                completed: appointmentsToday?.filter(a => a.status === 'completed').length || 0,
+                cancelled: appointmentsToday?.filter(a => a.status === 'cancelled').length || 0,
+            };
+
+            // 2. Próximos Turnos
+            const { data: upcoming } = await supabase
+                .from('appointments')
+                .select(`
+          id, start_at, end_at, status, price_cents,
+          users:client_user_id(full_name, email),
+          services(name, duration_minutes)
+        `)
+                .eq('business_id', business.id)
+                .in('status', ['pending', 'confirmed'])
+                .gte('start_at', now)
+                .order('start_at', { ascending: true })
+                .limit(5);
+
+            setUpcomingAppointments(upcoming as unknown as Appointment[]);
+
+            // 3. Esta Semana
+            const d = new Date();
+            const first = d.getDate() - d.getDay() + (d.getDay() === 0 ? -6 : 1);
+            const startOfWeek = new Date(d.setDate(first)).toISOString().split('T')[0] + 'T00:00:00Z';
+            const endOfWeek = new Date(d.setDate(first + 6)).toISOString().split('T')[0] + 'T23:59:59Z';
+
+            const { data: weekData } = await supabase
+                .from('appointments')
+                .select('id, status, price_cents')
+                .eq('business_id', business.id)
+                .gte('start_at', startOfWeek)
+                .lte('start_at', endOfWeek);
+
+            const weekRev = weekData?.reduce((acc, curr) =>
+                (curr.status === 'confirmed' || curr.status === 'completed') ? acc + curr.price_cents : acc, 0) || 0;
+
+            setStats({
+                todayTotal: todayStats.total,
+                todayPending: todayStats.pending,
+                todayCompleted: todayStats.completed,
+                todayCancelled: todayStats.cancelled,
+                weekCount: weekData?.length || 0,
+                weekRevenue: weekRev,
+                weekOccupancy: Math.min(Math.round(((weekData?.length || 0) / 100) * 100), 100),
+            });
+
+            // 4. Verificar configuración faltante
+            const [{ count: sCount }, { count: schCount }] = await Promise.all([
+                supabase.from('services').select('id', { count: 'exact', head: true }).eq('business_id', business.id),
+                supabase.from('schedules').select('id', { count: 'exact', head: true }).eq('business_id', business.id)
+            ]);
+            setNeedsConfig({ services: sCount === 0, schedules: schCount === 0 });
+
+            const status = await AsyncStorage.getItem(`onboarding_done_${business.id}`);
+            setOnboardingStatus(status);
+
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+            NativeAnimated.timing(screenOpacity, { toValue: 1, duration: 800, useNativeDriver: true }).start();
+        }
+    }, [business]);
+
+    useEffect(() => {
+        fetchDashboardData();
+
+        const hour = new Date().getHours();
+        if (hour < 12) setGreeting('Buenos días');
+        else if (hour < 19) setGreeting('Buenas tardes');
+        else setGreeting('Buenas noches');
+    }, [fetchDashboardData]);
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchDashboardData();
+    };
+
+    const renderKPI = (title: string, value: number, label: string, color: string, icon: string) => (
+        <View style={styles.kpiCard}>
+            <View style={[styles.kpiIconBg, { backgroundColor: color + '20' }]}>
+                <Ionicons name={icon as any} size={20} color={color} />
+            </View>
+            <Text style={[styles.kpiValue, { color }]}>{value}</Text>
+            <Text style={styles.kpiLabel}>{label}</Text>
+        </View>
+    );
+
+    return (
+        <View style={styles.container}>
+            <View style={styles.header}>
+                <View style={styles.headerLeft}>
+                    <View style={styles.smallLogo}>
+                        <View style={styles.calendarMini} />
+                    </View>
+                    <Text style={styles.headerTitle}>TurnoSync ADMIN</Text>
+                </View>
+                <Text style={styles.businessName} numberOfLines={1}>{business?.name}</Text>
+                <TouchableOpacity style={styles.avatar} onPress={() => navigation.navigate('Perfil')}>
+                    <Text style={styles.avatarText}>
+                        {userProfile?.full_name?.charAt(0) || 'A'}
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.menuBtn} onPress={() => navigation.navigate('Perfil')}>
+                    <Ionicons name="settings-outline" size={20} color="#A0A0B0" />
+                </TouchableOpacity>
+            </View>
+
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#E94560']} tintColor="#E94560" />
+                }
+            >
+                {loading ? (
+                    <DashboardSkeleton />
+                ) : (
+                    <NativeAnimated.View style={{ opacity: screenOpacity }}>
+                        {/* Saludo */}
+                        <View style={styles.greetingSection}>
+                            <Text style={styles.greetingText}>{greeting}, {userProfile?.full_name?.split(' ')[0]}!</Text>
+                            <Text style={styles.dateText}>{getLongDate()}</Text>
+                            <Text style={styles.locationText}>{business?.name} • {business?.address?.split(',')[0] || 'Ciudad'}</Text>
+                        </View>
+
+                        {/* Banner configuración */}
+                        {(onboardingStatus === 'skipped' || needsConfig.services || needsConfig.schedules) && (
+                            <TouchableOpacity
+                                style={styles.onboardingBanner}
+                                onPress={() => navigation.navigate(needsConfig.services ? 'Servicios' : 'Horarios')}
+                            >
+                                <View style={styles.bannerIconBox}>
+                                    <Ionicons name="warning-outline" size={24} color="#F5A623" />
+                                </View>
+                                <View style={{ flex: 1, marginLeft: 12 }}>
+                                    <Text style={styles.bannerTitle}>Tu negocio no está completamente configurado</Text>
+                                    <Text style={styles.bannerSub}>
+                                        Falta: {needsConfig.services ? 'Servicios' : ''} {needsConfig.services && needsConfig.schedules ? ' • ' : ''} {needsConfig.schedules ? 'Horarios' : ''}
+                                    </Text>
+                                </View>
+                                <View style={styles.bannerAction}>
+                                    <Text style={styles.bannerActionText}>Configurar</Text>
+                                </View>
+                            </TouchableOpacity>
+                        )}
+
+                        {/* KPIs Hoy */}
+                        <View style={styles.kpiGrid}>
+                            {renderKPI('Turnos Hoy', stats.todayTotal, 'Total del día', '#4A9FFF', 'calendar')}
+                            {renderKPI('Pendientes', stats.todayPending, 'Sin confirmar', '#F5A623', 'time')}
+                            {renderKPI('Completados', stats.todayCompleted, 'Hasta ahora', '#2ECC71', 'checkmark-done')}
+                            {renderKPI('Cancelados', stats.todayCancelled, 'Hoy', '#E94560', 'close-circle')}
+                        </View>
+
+                        {/* KPI Semanal */}
+                        <LinearGradient colors={['#1E1E3A', '#0F3460']} style={styles.weeklyCard}>
+                            <View style={styles.weeklyHeader}>
+                                <Text style={styles.weeklyTitle}>ESTA SEMANA</Text>
+                                <Ionicons name="stats-chart" size={18} color="#E94560" />
+                            </View>
+                            <Text style={styles.weeklyInfo}>
+                                {stats.weekCount} turnos • <Text style={styles.revenueText}>{formatCurrency(stats.weekRevenue)}</Text> en servicios
+                            </Text>
+                            <View style={styles.occupancyContainer}>
+                                <View style={styles.progressBarBg}>
+                                    <View style={[styles.progressBarFill, { width: `${stats.weekOccupancy}%` }]} />
+                                </View>
+                                <Text style={styles.occupancyText}>{stats.weekOccupancy}% de ocupación</Text>
+                            </View>
+                        </LinearGradient>
+
+                        {/* Próximos Turnos */}
+                        <View style={styles.sectionHeader}>
+                            <Text style={styles.sectionTitle}>Próximas citas</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('Turnos')}>
+                                <Text style={styles.seeMore}>Ver todas →</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.upcomingList}>
+                            {upcomingAppointments.length === 0 ? (
+                                <View style={styles.emptyState}>
+                                    <Ionicons name="calendar-outline" size={48} color="#2A2A4A" />
+                                    <Text style={styles.emptyText}>No hay citas próximas</Text>
+                                </View>
+                            ) : (
+                                upcomingAppointments.map((item, index) => (
+                                    <View key={item.id} style={styles.appointmentItem}>
+                                        <View style={styles.timeBox}>
+                                            <Text style={styles.timeText}>
+                                                {new Date(item.start_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </Text>
+                                        </View>
+                                        <View style={styles.appointmentInfo}>
+                                            <Text style={styles.clientName}>{(item as any).users?.full_name || 'Cliente'}</Text>
+                                            <Text style={styles.serviceName}>{(item as any).services?.name} • {(item as any).services?.duration_minutes} min</Text>
+                                            <View style={[
+                                                styles.statusBadge,
+                                                { backgroundColor: item.status === 'pending' ? '#F5A623' : '#2ECC71' }
+                                            ]}>
+                                                <Text style={styles.statusBadgeText}>
+                                                    {item.status === 'pending' ? 'PENDIENTE' : 'CONFIRMADO'}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                        <Ionicons name="chevron-forward" size={18} color="#2A2A4A" />
+                                    </View>
+                                ))
+                            )}
+                        </View>
+
+                        {/* Estadísticas Rápidas */}
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.quickStatsScroll}>
+                            <View style={styles.quickStatCard}>
+                                <Text style={styles.quickStatLabel}>Top Servicio</Text>
+                                <Text style={styles.quickStatValue} numberOfLines={1}>Corte de Cabello</Text>
+                            </View>
+                            <View style={styles.quickStatCard}>
+                                <Text style={styles.quickStatLabel}>Hora Pico</Text>
+                                <Text style={styles.quickStatValue}>16:00 - 18:00</Text>
+                            </View>
+                            <View style={styles.quickStatCard}>
+                                <Text style={styles.quickStatLabel}>Promedio Diario</Text>
+                                <Text style={styles.quickStatValue}>12 turnos</Text>
+                            </View>
+                        </ScrollView>
+
+                        {/* Accesos Rápidos */}
+                        <View style={styles.quickAccessGrid}>
+                            <TouchableOpacity style={styles.quickAccessBtn} onPress={() => navigation.navigate('Servicios')}>
+                                <Ionicons name="cut" size={24} color="#E94560" />
+                                <Text style={styles.quickAccessLabel}>Servicios</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.quickAccessBtn} onPress={() => navigation.navigate('Horarios')}>
+                                <Ionicons name="calendar" size={24} color="#E94560" />
+                                <Text style={styles.quickAccessLabel}>Horarios</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.quickAccessBtn} onPress={() => navigation.navigate('Turnos')}>
+                                <Ionicons name="clipboard" size={24} color="#E94560" />
+                                <Text style={styles.quickAccessLabel}>Turnos</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.quickAccessBtn} onPress={() => { }}>
+                                <Ionicons name="settings-outline" size={24} color="#E94560" />
+                                <Text style={styles.quickAccessLabel}>Configuración</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </NativeAnimated.View>
+                )}
+            </ScrollView>
+        </View>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: { flex: 1, backgroundColor: '#1A1A2E' },
+    header: {
+        paddingTop: Platform.OS === 'ios' ? 60 : 40,
+        paddingBottom: 15,
+        paddingHorizontal: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#16213E',
+        borderBottomWidth: 1,
+        borderBottomColor: '#2A2A4A',
+    },
+    headerLeft: { flexDirection: 'row', alignItems: 'center' },
+    smallLogo: {
+        width: 24,
+        height: 24,
+        borderWidth: 1.5,
+        borderColor: '#E94560',
+        borderRadius: 4,
+        marginRight: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    calendarMini: {
+        width: 10,
+        height: 6,
+        borderLeftWidth: 1.5,
+        borderBottomWidth: 1.5,
+        borderColor: '#E94560',
+        transform: [{ rotate: '-45deg' }],
+    },
+    headerTitle: { color: '#A0A0B0', fontSize: 10, fontWeight: 'bold' },
+    businessName: { color: 'white', fontSize: 14, fontWeight: 'bold', flex: 1, textAlign: 'center', marginHorizontal: 10 },
+    avatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#E94560', justifyContent: 'center', alignItems: 'center' },
+    avatarText: { color: 'white', fontSize: 14, fontWeight: 'bold' },
+    menuBtn: { padding: 5, marginLeft: 5 },
+    scrollContent: { paddingBottom: 40 },
+    greetingSection: { padding: 20 },
+    greetingText: { color: 'white', fontSize: 22, fontWeight: 'bold' },
+    dateText: { color: '#A0A0B0', fontSize: 14, marginTop: 4 },
+    locationText: { color: '#606070', fontSize: 12, marginTop: 2 },
+    kpiGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 15, justifyContent: 'space-between' },
+    kpiCard: { width: (width - 45) / 2, backgroundColor: '#1E1E3A', borderRadius: 16, padding: 16, marginBottom: 15 },
+    kpiIconBg: { width: 36, height: 36, borderRadius: 10, justifyContent: 'center', alignItems: 'center', position: 'absolute', top: 12, right: 12 },
+    kpiValue: { fontSize: 32, fontWeight: 'bold', marginTop: 8 },
+    kpiLabel: { color: '#A0A0B0', fontSize: 12, marginTop: 4 },
+    weeklyCard: { marginHorizontal: 20, borderRadius: 16, padding: 20, marginBottom: 25 },
+    weeklyHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+    weeklyTitle: { color: '#A0A0B0', fontSize: 12, fontWeight: 'bold', letterSpacing: 1 },
+    weeklyInfo: { color: 'white', fontSize: 16, marginBottom: 15 },
+    revenueText: { fontWeight: 'bold', color: '#2ECC71' },
+    occupancyContainer: { flexDirection: 'row', alignItems: 'center' },
+    progressBarBg: { flex: 1, height: 6, backgroundColor: '#2A2A4A', borderRadius: 3, marginRight: 12, overflow: 'hidden' },
+    progressBarFill: { height: '100%', backgroundColor: '#E94560' },
+    occupancyText: { color: '#A0A0B0', fontSize: 12 },
+    sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginBottom: 15 },
+    sectionTitle: { color: 'white', fontSize: 18, fontWeight: 'bold' },
+    seeMore: { color: '#E94560', fontSize: 14 },
+    upcomingList: { paddingHorizontal: 20, marginBottom: 25 },
+    appointmentItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1E1E3A', borderRadius: 12, padding: 12, marginBottom: 10 },
+    timeBox: { width: 60, justifyContent: 'center' },
+    timeText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+    appointmentInfo: { flex: 1, paddingHorizontal: 12 },
+    clientName: { color: 'white', fontSize: 14, fontWeight: '500' },
+    serviceName: { color: '#A0A0B0', fontSize: 13, marginTop: 2 },
+    statusBadge: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginTop: 6 },
+    statusBadgeText: { fontSize: 10, fontWeight: 'bold', color: '#1A1A2E' },
+    emptyState: { alignItems: 'center', paddingVertical: 30, backgroundColor: '#1E1E3A', borderRadius: 16, borderWidth: 1, borderColor: '#2A2A4A', borderStyle: 'dashed' },
+    emptyText: { color: '#606070', marginTop: 10 },
+    quickStatsScroll: { paddingLeft: 20, marginBottom: 25 },
+    quickStatCard: { width: 160, height: 90, backgroundColor: '#1E1E3A', borderRadius: 16, padding: 16, marginRight: 15, justifyContent: 'center' },
+    quickStatLabel: { color: '#A0A0B0', fontSize: 12, marginBottom: 4 },
+    quickStatValue: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+    quickAccessGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 15, justifyContent: 'space-between' },
+    quickAccessBtn: { width: (width - 45) / 2, height: 90, backgroundColor: '#1E1E3A', borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 15 },
+    quickAccessLabel: { color: 'white', fontSize: 14, marginTop: 8 },
+    skeletonContainer: { padding: 20 },
+    skeleton: { backgroundColor: '#1E1E3A', borderRadius: 8 },
+    kpiCardSkeleton: { width: (width - 50) / 2, height: 100, marginBottom: 10, borderRadius: 16 },
+    weeklyCardSkeleton: { width: '100%', height: 120, borderRadius: 16, marginBottom: 20 },
+    titleSkeleton: { width: 150, height: 24, marginBottom: 15 },
+    listSkeleton: { width: '100%', height: 80, marginBottom: 10, borderRadius: 12 },
+    onboardingBanner: { marginHorizontal: 20, marginBottom: 25, backgroundColor: 'rgba(245, 166, 35, 0.1)', borderWidth: 1, borderColor: '#F5A623', borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'center' },
+    bannerIconBox: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(245, 166, 35, 0.15)', justifyContent: 'center', alignItems: 'center' },
+    bannerTitle: { color: 'white', fontSize: 13, fontWeight: 'bold' },
+    bannerSub: { color: '#F5A623', fontSize: 12, marginTop: 2 },
+    bannerAction: { backgroundColor: '#F5A623', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 10, marginLeft: 10 },
+    bannerActionText: { color: '#1A1A2E', fontSize: 12, fontWeight: 'bold' },
+});
+
+export default DashboardScreen;
