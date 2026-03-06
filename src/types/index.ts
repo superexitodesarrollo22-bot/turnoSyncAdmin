@@ -7,6 +7,7 @@ export interface UserProfile {
     email: string;
     full_name: string | null;
     avatar_url: string | null;
+    is_superuser: boolean;
     created_at: string;
 }
 
@@ -86,6 +87,7 @@ export interface BusinessUser {
 }
 
 export interface SubscriptionRequest {
+    id: string;
     full_name: string;
     email: string;
     phone: string;
@@ -94,5 +96,8 @@ export interface SubscriptionRequest {
     company_phone: string;
     company_description: string;
     estimated_services: string;
-    message: string | null;
+    status: 'pending' | 'approved' | 'rejected';
+    notes?: string;
+    reviewed_at?: string;
+    created_at: string;
 }

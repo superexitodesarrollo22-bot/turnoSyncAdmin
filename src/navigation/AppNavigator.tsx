@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef, CommonActions } from '@react-navigation/native';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import * as Linking from 'expo-linking';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,6 +10,7 @@ import SplashScreen from '../screens/SplashScreen';
 import AuthNavigator from './AuthNavigator';
 import MainNavigator from './MainNavigator';
 import OnboardingNavigator from './OnboardingNavigator';
+import SuperuserNavigator from './SuperuserNavigator';
 import * as Notifications from 'expo-notifications';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 
@@ -38,15 +39,20 @@ export const linkingConfig = {
 const Stack = createStackNavigator();
 export const navigationRef = createNavigationContainerRef<any>();
 
-type AppStage = 'splash' | 'auth' | 'onboarding' | 'main';
+type AppStage = 'splash' | 'auth' | 'onboarding' | 'main' | 'superuser';
 
 const AppNavigator = () => {
-    const { session, business } = useAuth();
+    const { session, business, isSuperuser } = useAuth();
     const [stage, setStage] = useState<AppStage>('splash');
 
     const checkNavigationState = useCallback(async () => {
         if (!session) {
             setStage('auth');
+            return;
+        }
+
+        if (isSuperuser) {
+            setStage('superuser');
             return;
         }
 
@@ -83,13 +89,13 @@ const AppNavigator = () => {
                 setStage('main');
             }
         }
-    }, [session, business]);
+    }, [session, business, isSuperuser]);
 
     useEffect(() => {
         if (stage !== 'splash') {
             checkNavigationState();
         }
-    }, [session, business, checkNavigationState]);
+    }, [session, business, isSuperuser, checkNavigationState]);
 
     // Manejo de Deep Links
     useEffect(() => {
@@ -114,22 +120,47 @@ const AppNavigator = () => {
 
     // Manejo de Notificaciones
     useEffect(() => {
+        // Listener: usuario TOCA la notificación (app cerrada o en background)
         const responseSubscription = Notifications.addNotificationResponseReceivedListener(response => {
             const data = response.notification.request.content.data;
-            if (data?.appointmentId && navigationRef.isReady()) {
-                navigationRef.navigate('Main', {
-                    screen: 'Turnos',
-                    params: { appointmentId: data.appointmentId }
-                });
+            if (!data?.appointmentId) return;
+
+            const type = data.type as string;
+
+            if (type === 'new_appointment' || type === 'reminder_admin') {
+                // Delay para que NavigationContainer esté listo tras arranque en frío
+                setTimeout(() => {
+                    if (navigationRef.isReady()) {
+                        navigationRef.dispatch(
+                            CommonActions.navigate('Main', {
+                                screen: 'Turnos',
+                                params: { appointmentId: data.appointmentId },
+                            })
+                        );
+                    }
+                }, 500);
             }
         });
 
-        return () => responseSubscription.remove();
+        // Listener: notificación recibida con app en PRIMER PLANO
+        const foregroundSub = Notifications.addNotificationReceivedListener(notification => {
+            console.log(
+                '[Push] Notificación en primer plano:',
+                notification.request.content.title
+            );
+        });
+
+        return () => {
+            responseSubscription.remove();
+            foregroundSub.remove();
+        };
     }, []);
 
     const handleSplashFinish = () => {
         if (!session) {
             setStage('auth');
+        } else if (isSuperuser) {
+            setStage('superuser');
         } else {
             checkNavigationState();
         }
@@ -151,6 +182,8 @@ const AppNavigator = () => {
             >
                 {stage === 'auth' ? (
                     <Stack.Screen name="Auth" component={AuthNavigator} />
+                ) : stage === 'superuser' ? (
+                    <Stack.Screen name="Superuser" component={SuperuserNavigator} />
                 ) : stage === 'onboarding' ? (
                     <Stack.Screen name="Onboarding">
                         {() => <OnboardingNavigator onComplete={() => setStage('main')} />}

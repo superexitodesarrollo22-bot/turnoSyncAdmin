@@ -8,6 +8,7 @@ interface AuthContextType {
     session: Session | null;
     userProfile: UserProfile | null;
     business: Business | null;
+    isSuperuser: boolean;
     loading: boolean;
     expoPushToken: string | null;
     signOut: () => Promise<void>;
@@ -20,6 +21,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [session, setSession] = useState<Session | null>(null);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const [business, setBusiness] = useState<Business | null>(null);
+    const [isSuperuser, setIsSuperuser] = useState(false);
     const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -34,6 +36,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
             if (profileError) throw profileError;
             setUserProfile(profile);
+
+            // Detectar superuser
+            if (profile?.is_superuser) {
+                setIsSuperuser(true);
+                setBusiness(null);
+                // No registrar push ni cargar business para el superuser
+                return;
+            }
+
+            // Flujo normal para admins
+            setIsSuperuser(false);
 
             // Registro de notificaciones
             const token = await registerForPushNotifications(profile.id);
@@ -89,6 +102,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             } else {
                 setUserProfile(null);
                 setBusiness(null);
+                setIsSuperuser(false);
                 setExpoPushToken(null);
             }
         });
@@ -104,6 +118,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setSession(null);
             setUserProfile(null);
             setBusiness(null);
+            setIsSuperuser(false);
             setExpoPushToken(null);
         } catch (error) {
             console.error('Error signing out:', error);
@@ -111,7 +126,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ session, userProfile, business, loading, expoPushToken, signOut, refreshBusiness }}>
+        <AuthContext.Provider value={{ session, userProfile, business, isSuperuser, loading, expoPushToken, signOut, refreshBusiness }}>
             {children}
         </AuthContext.Provider>
     );

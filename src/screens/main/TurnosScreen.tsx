@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useRoute } from '@react-navigation/native';
 import {
     View,
     Text,
@@ -55,6 +56,10 @@ const STATUS_COLORS: Record<AppointmentStatus, string> = {
 const TurnosScreen = ({ navigation }: any) => {
     const { business, userProfile } = useAuth();
     const toastRef = useRef<ToastRef>(null);
+    const route = useRoute();
+
+    // Lee el appointmentId si la pantalla se abrió desde una notificación push
+    const appointmentIdFromNotif = (route.params as any)?.appointmentId as string | undefined;
 
     // States
     const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -117,6 +122,41 @@ const TurnosScreen = ({ navigation }: any) => {
             setRefreshing(false);
         }
     }, [business, selectedDate, statusFilter]);
+
+    // Abre el detalle del turno cuando la pantalla se navega desde una notificación
+    useEffect(() => {
+        if (!appointmentIdFromNotif || !business) return;
+        buscarTurnoPorId(appointmentIdFromNotif);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [appointmentIdFromNotif, business]);
+
+    // Busca un turno por id aunque no esté en la vista actual
+    const buscarTurnoPorId = async (id: string) => {
+        try {
+            const { data, error } = await supabase
+                .from('appointments')
+                .select(`
+                    id, start_at, end_at, status, price_cents, notes, created_at,
+                    users:client_user_id(id, full_name, email),
+                    services(id, name, duration_minutes),
+                    staff(id, name, specialty, photo_url)
+                `)
+                .eq('id', id)
+                .eq('business_id', business!.id)
+                .single();
+
+            if (error || !data) return;
+
+            // Si el turno es de otro día, cambiar la fecha seleccionada
+            const fechaDelTurno = new Date(data.start_at);
+            setSelectedDate(fechaDelTurno);
+
+            // Abrir el detalle directamente
+            setSelectedAppointment(data as unknown as Appointment);
+        } catch (err) {
+            console.error('[Push] Error al buscar turno por id:', err);
+        }
+    };
 
     useEffect(() => {
         fetchAppointments();
