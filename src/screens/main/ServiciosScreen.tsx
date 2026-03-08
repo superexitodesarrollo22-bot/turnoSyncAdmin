@@ -23,6 +23,11 @@ import { useAuth } from '../../hooks/useAuth';
 import { formatCurrency, getInitials } from '../../utils/helpers';
 import { Service, Staff } from '../../types';
 import Toast, { ToastRef } from '../../components/Toast';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { ListScreenSkeleton, StaffCardSkeleton } from '../../components/ui/SkeletonLoader';
+import AnimatedPressable from '../../components/ui/AnimatedPressable';
+import FadeInView from '../../components/ui/FadeInView';
+import { GradientButton } from '../../components/ui/GradientButton';
 
 const { width, height } = Dimensions.get('window');
 
@@ -389,85 +394,89 @@ const ServiciosScreen = () => {
 
     // --- RENDER ITEMS ---
     const renderServiceItem = ({ item, index }: { item: Service, index: number }) => (
-        <View style={styles.card}>
-            <View style={styles.cardHeader}>
-                <View style={styles.iconContainer}>
-                    <Ionicons name="cut-outline" size={24} color="#E94560" />
-                </View>
-                <View style={styles.cardMain}>
-                    <Text style={styles.cardTitle}>{item.name}</Text>
-                    <Text style={styles.cardSubtitle}>
-                        {item.duration_minutes} min • {formatCurrency(item.price_cents)}
-                    </Text>
-                </View>
-                <View style={styles.cardRight}>
-                    <View style={[
-                        styles.statusBadge,
-                        { backgroundColor: item.active ? 'rgba(46, 204, 113, 0.2)' : 'rgba(160, 160, 176, 0.2)' }
-                    ]}>
-                        <Text style={[styles.statusText, { color: item.active ? '#2ECC71' : '#A0A0B0' }]}>
-                            {item.active ? 'ACTIVO' : 'INACTIVO'}
+        <FadeInView delay={index * 80}>
+            <AnimatedPressable style={styles.card}>
+                <View style={styles.cardHeader}>
+                    <View style={styles.iconContainer}>
+                        <Ionicons name="cut-outline" size={24} color="#E94560" />
+                    </View>
+                    <View style={styles.cardMain}>
+                        <Text style={styles.cardTitle}>{item.name}</Text>
+                        <Text style={styles.cardSubtitle}>
+                            {item.duration_minutes} min • {formatCurrency(item.price_cents)}
                         </Text>
                     </View>
-                    <Switch
-                        value={item.active}
-                        onValueChange={() => handleToggleServiceActive(item)}
-                        trackColor={{ false: '#3A3A5A', true: '#2ECC71' }}
-                        thumbColor={Platform.OS === 'android' ? '#FFFFFF' : ''}
-                    />
+                    <View style={styles.cardRight}>
+                        <View style={[
+                            styles.statusBadge,
+                            { backgroundColor: item.active ? 'rgba(46, 204, 113, 0.2)' : 'rgba(160, 160, 176, 0.2)' }
+                        ]}>
+                            <Text style={[styles.statusText, { color: item.active ? '#2ECC71' : '#A0A0B0' }]}>
+                                {item.active ? 'ACTIVO' : 'INACTIVO'}
+                            </Text>
+                        </View>
+                        <Switch
+                            value={item.active}
+                            onValueChange={() => handleToggleServiceActive(item)}
+                            trackColor={{ false: '#3A3A5A', true: '#2ECC71' }}
+                            thumbColor={Platform.OS === 'android' ? '#FFFFFF' : ''}
+                        />
+                    </View>
                 </View>
-            </View>
-            <View style={styles.cardActions}>
-                <TouchableOpacity style={styles.actionBtn} onPress={() => handleOpenServiceModal(item)}>
-                    <Ionicons name="pencil-outline" size={18} color="#4A9FFF" />
-                    <Text style={styles.actionBtnText}>Editar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionBtn} onPress={() => handleDeleteService(item)}>
-                    <Ionicons name="trash-outline" size={18} color="#E94560" />
-                    <Text style={[styles.actionBtnText, { color: '#E94560' }]}>Eliminar</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+                <View style={styles.cardActions}>
+                    <TouchableOpacity style={styles.actionBtn} onPress={() => handleOpenServiceModal(item)}>
+                        <Ionicons name="pencil-outline" size={18} color="#4A9FFF" />
+                        <Text style={styles.actionBtnText}>Editar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionBtn} onPress={() => handleDeleteService(item)}>
+                        <Ionicons name="trash-outline" size={18} color="#E94560" />
+                        <Text style={[styles.actionBtnText, { color: '#E94560' }]}>Eliminar</Text>
+                    </TouchableOpacity>
+                </View>
+            </AnimatedPressable>
+        </FadeInView>
     );
 
     const renderStaffItem = ({ item, index }: { item: Staff, index: number }) => (
-        <View style={styles.card}>
-            <View style={styles.cardHeader}>
-                <View style={[styles.avatarCircle, { backgroundColor: getAvatarColor(item.name) }]}>
-                    <Text style={styles.avatarText}>{getInitials(item.name)}</Text>
-                </View>
-                <View style={styles.cardMain}>
-                    <Text style={styles.cardTitle}>{item.name}</Text>
-                    <Text style={styles.cardSubtitle}>{item.specialty || 'Sin especialidad'}</Text>
-                </View>
-                <View style={styles.cardRight}>
-                    <View style={[
-                        styles.statusBadge,
-                        { backgroundColor: item.active ? 'rgba(46, 204, 113, 0.2)' : 'rgba(160, 160, 176, 0.2)' }
-                    ]}>
-                        <Text style={[styles.statusText, { color: item.active ? '#2ECC71' : '#A0A0B0' }]}>
-                            {item.active ? 'ACTIVO' : 'INACTIVO'}
-                        </Text>
+        <FadeInView delay={index * 80}>
+            <AnimatedPressable style={styles.card}>
+                <View style={styles.cardHeader}>
+                    <View style={[styles.avatarCircle, { backgroundColor: getAvatarColor(item.name) }]}>
+                        <Text style={styles.avatarText}>{getInitials(item.name)}</Text>
                     </View>
-                    <Switch
-                        value={item.active}
-                        onValueChange={() => handleToggleStaffActive(item)}
-                        trackColor={{ false: '#3A3A5A', true: '#2ECC71' }}
-                        thumbColor={Platform.OS === 'android' ? '#FFFFFF' : ''}
-                    />
+                    <View style={styles.cardMain}>
+                        <Text style={styles.cardTitle}>{item.name}</Text>
+                        <Text style={styles.cardSubtitle}>{item.specialty || 'Sin especialidad'}</Text>
+                    </View>
+                    <View style={styles.cardRight}>
+                        <View style={[
+                            styles.statusBadge,
+                            { backgroundColor: item.active ? 'rgba(46, 204, 113, 0.2)' : 'rgba(160, 160, 176, 0.2)' }
+                        ]}>
+                            <Text style={[styles.statusText, { color: item.active ? '#2ECC71' : '#A0A0B0' }]}>
+                                {item.active ? 'ACTIVO' : 'INACTIVO'}
+                            </Text>
+                        </View>
+                        <Switch
+                            value={item.active}
+                            onValueChange={() => handleToggleStaffActive(item)}
+                            trackColor={{ false: '#3A3A5A', true: '#2ECC71' }}
+                            thumbColor={Platform.OS === 'android' ? '#FFFFFF' : ''}
+                        />
+                    </View>
                 </View>
-            </View>
-            <View style={styles.cardActions}>
-                <TouchableOpacity style={styles.actionBtn} onPress={() => handleOpenStaffModal(item)}>
-                    <Ionicons name="pencil-outline" size={18} color="#4A9FFF" />
-                    <Text style={styles.actionBtnText}>Editar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionBtn} onPress={() => handleDeleteStaff(item)}>
-                    <Ionicons name="trash-outline" size={18} color="#E94560" />
-                    <Text style={[styles.actionBtnText, { color: '#E94560' }]}>Eliminar</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+                <View style={styles.cardActions}>
+                    <TouchableOpacity style={styles.actionBtn} onPress={() => handleOpenStaffModal(item)}>
+                        <Ionicons name="pencil-outline" size={18} color="#4A9FFF" />
+                        <Text style={styles.actionBtnText}>Editar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionBtn} onPress={() => handleDeleteStaff(item)}>
+                        <Ionicons name="trash-outline" size={18} color="#E94560" />
+                        <Text style={[styles.actionBtnText, { color: '#E94560' }]}>Eliminar</Text>
+                    </TouchableOpacity>
+                </View>
+            </AnimatedPressable>
+        </FadeInView>
     );
 
     return (
@@ -501,8 +510,14 @@ const ServiciosScreen = () => {
 
             <View style={styles.content}>
                 {loading ? (
-                    <View style={styles.loadingCenter}>
-                        <ActivityIndicator size="large" color="#E94560" />
+                    <View style={styles.listContainer}>
+                        {activeTab === 'servicios' ? (
+                            <ListScreenSkeleton count={5} />
+                        ) : (
+                            <View>
+                                {[1, 2, 3, 4, 5].map(i => <StaffCardSkeleton key={i} />)}
+                            </View>
+                        )}
                     </View>
                 ) : (
                     <FlatList
@@ -512,29 +527,17 @@ const ServiciosScreen = () => {
                         contentContainerStyle={styles.listContainer}
                         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E94560" />}
                         ListEmptyComponent={
-                            <View style={styles.emptyContainer}>
-                                <Ionicons
-                                    name={activeTab === 'servicios' ? "cut-outline" : "people-outline"}
-                                    size={80}
-                                    color="#2A2A4A"
-                                />
-                                <Text style={styles.emptyTitle}>
-                                    {activeTab === 'servicios' ? 'No hay servicios' : 'No hay personal'}
-                                </Text>
-                                <Text style={styles.emptySubtitle}>
-                                    {activeTab === 'servicios'
-                                        ? 'Agrega los servicios que ofrece tu negocio para recibit reservas.'
-                                        : 'Registra a tu equipo de trabajo para asignarles turnos.'}
-                                </Text>
-                                <TouchableOpacity
-                                    style={styles.emptyBtn}
-                                    onPress={() => activeTab === 'servicios' ? handleOpenServiceModal() : handleOpenStaffModal()}
-                                >
-                                    <Text style={styles.emptyBtnText}>
-                                        {activeTab === 'servicios' ? 'Crear servicio' : 'Agregar personal'}
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
+                            <EmptyState
+                                icon={activeTab === 'servicios' ? 'cut-outline' : 'people-outline'}
+                                title={activeTab === 'servicios' ? 'Sin servicios configurados' : 'Sin miembros del equipo'}
+                                subtitle={
+                                    activeTab === 'servicios'
+                                        ? 'Configura los servicios que ofrece tu negocio.'
+                                        : 'Agrega tu primer colaborador para comenzar a gestionar turnos.'
+                                }
+                                actionLabel={activeTab === 'servicios' ? 'Crear servicio' : 'Agregar miembro'}
+                                onAction={() => activeTab === 'servicios' ? handleOpenServiceModal() : handleOpenStaffModal()}
+                            />
                         }
                     />
                 )}
@@ -625,11 +628,13 @@ const ServiciosScreen = () => {
                                     <Switch value={serviceActive} onValueChange={setServiceActive} trackColor={{ false: '#3A3A5A', true: '#2ECC71' }} />
                                 </View>
                             )}
-                            <TouchableOpacity style={styles.saveBtn} onPress={handleSaveService} disabled={serviceFormLoading}>
-                                <LinearGradient colors={['#E94560', '#C73652']} style={styles.saveGradient}>
-                                    {serviceFormLoading ? <ActivityIndicator color="white" /> : <Text style={styles.saveBtnText}>Guardar Servicio</Text>}
-                                </LinearGradient>
-                            </TouchableOpacity>
+                            <GradientButton
+                                label="Guardar Servicio"
+                                onPress={handleSaveService}
+                                loading={serviceFormLoading}
+                                disabled={serviceFormLoading}
+                                style={{ marginTop: 10 }}
+                            />
                         </ScrollView>
                     </View>
                 </KeyboardAvoidingView>
@@ -679,11 +684,13 @@ const ServiciosScreen = () => {
                                     <Switch value={staffActive} onValueChange={setStaffActive} trackColor={{ false: '#3A3A5A', true: '#2ECC71' }} />
                                 </View>
                             )}
-                            <TouchableOpacity style={styles.saveBtn} onPress={handleSaveStaff} disabled={staffFormLoading}>
-                                <LinearGradient colors={['#E94560', '#C73652']} style={styles.saveGradient}>
-                                    {staffFormLoading ? <ActivityIndicator color="white" /> : <Text style={styles.saveBtnText}>Guardar Personal</Text>}
-                                </LinearGradient>
-                            </TouchableOpacity>
+                            <GradientButton
+                                label="Guardar Personal"
+                                onPress={handleSaveStaff}
+                                loading={staffFormLoading}
+                                disabled={staffFormLoading}
+                                style={{ marginTop: 10 }}
+                            />
                         </ScrollView>
                     </View>
                 </KeyboardAvoidingView>

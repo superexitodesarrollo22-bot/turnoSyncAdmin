@@ -25,6 +25,7 @@ import { formatCurrency, formatTime12h, getISODate, getLongDate, getShortDayName
 import { getActiveStaff } from '../../services/staffService';
 import { Appointment, AppointmentStatus, Staff } from '../../types';
 import Toast, { ToastRef } from '../../components/Toast';
+import { EmptyState } from '../../components/ui/EmptyState';
 import {
     scheduleAppointmentReminder,
     cancelAppointmentReminder,
@@ -33,6 +34,12 @@ import {
 } from '../../utils/notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
+import { ListScreenSkeleton } from '../../components/ui/SkeletonLoader';
+import AnimatedPressable from '../../components/ui/AnimatedPressable';
+import FadeInView from '../../components/ui/FadeInView';
+import { StatusBadge } from '../../components/ui/StatusBadge';
+import { GradientButton } from '../../components/ui/GradientButton';
+import { PremiumCard } from '../../components/ui/PremiumCard';
 
 const { width, height } = Dimensions.get('window');
 
@@ -340,9 +347,9 @@ const TurnosScreen = ({ navigation }: any) => {
         const service = (item as any).services;
 
         return (
-            <View style={{ marginBottom: 12 }}>
-                <TouchableOpacity
-                    style={[styles.appointmentCard, isCancelled && { opacity: 0.6 }]}
+            <FadeInView delay={index * 80} style={{ marginBottom: 12 }}>
+                <PremiumCard
+                    style={[styles.appointmentCard, isCancelled ? { opacity: 0.6 } : {}, { padding: 0 }]}
                     onPress={() => setSelectedAppointment(item)}
                 >
                     <View style={[styles.statusBand, { backgroundColor: STATUS_COLORS[item.status] }]} />
@@ -362,11 +369,7 @@ const TurnosScreen = ({ navigation }: any) => {
                             </View>
 
                             <View style={styles.statusBadgeBlock}>
-                                <View style={[styles.statusBadge, { backgroundColor: STATUS_COLORS[item.status] + '20' }]}>
-                                    <Text style={[styles.statusBadgeText, { color: STATUS_COLORS[item.status] }]}>
-                                        {item.status.toUpperCase()}
-                                    </Text>
-                                </View>
+                                <StatusBadge status={item.status} size="sm" />
                             </View>
                         </View>
 
@@ -401,8 +404,8 @@ const TurnosScreen = ({ navigation }: any) => {
                             </View>
                         )}
                     </View>
-                </TouchableOpacity>
-            </View>
+                </PremiumCard>
+            </FadeInView>
         );
     };
 
@@ -448,9 +451,12 @@ const TurnosScreen = ({ navigation }: any) => {
                     contentContainerStyle={styles.listContent}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E94560" />}
                     ListEmptyComponent={
-                        <View style={styles.emptyContainer}>
-                            <Ionicons name="calendar-outline" size={60} color="#2A2A4A" />
-                            <Text style={styles.emptyTitle}>Sin turnos para este día</Text>
+                        <View style={{ paddingTop: 40 }}>
+                            <EmptyState
+                                icon="calendar-outline"
+                                title="Sin turnos por hoy"
+                                subtitle="No hay citas programadas. Las nuevas reservas aparecerán aquí."
+                            />
                         </View>
                     }
                 />
@@ -560,11 +566,7 @@ const TurnosScreen = ({ navigation }: any) => {
                     <View style={styles.bottomSheet}>
                         <View style={styles.sheetHandle} />
                         <View style={styles.sheetHeader}>
-                            <View style={[styles.statusBadge, { backgroundColor: STATUS_COLORS[selectedAppointment.status] + '20' }]}>
-                                <Text style={[styles.statusBadgeText, { color: STATUS_COLORS[selectedAppointment.status] }]}>
-                                    {selectedAppointment.status.toUpperCase()}
-                                </Text>
-                            </View>
+                            <StatusBadge status={selectedAppointment.status} size="md" />
                             <TouchableOpacity onPress={() => setSelectedAppointment(null)}>
                                 <Ionicons name="close" size={28} color="#A0A0B0" />
                             </TouchableOpacity>
@@ -652,23 +654,22 @@ const TurnosScreen = ({ navigation }: any) => {
 
                             <View style={styles.actionsContainer}>
                                 {selectedAppointment.status === 'pending' && !isPast && (
-                                    <TouchableOpacity
-                                        style={[styles.actionBtn, { backgroundColor: '#2ECC71' }]}
+                                    <GradientButton
+                                        label="Confirmar turno"
                                         onPress={() => handleUpdateStatus(selectedAppointment.id, 'confirmed')}
-                                    >
-                                        <Ionicons name="checkmark-done" size={20} color="white" />
-                                        <Text style={styles.actionBtnText}>Confirmar turno</Text>
-                                    </TouchableOpacity>
+                                        icon="checkmark-done"
+                                        variant="accent"
+                                    />
                                 )}
 
                                 {selectedAppointment.status === 'confirmed' && (
-                                    <TouchableOpacity
-                                        style={[styles.actionBtn, { backgroundColor: '#4A9FFF' }]}
+                                    <GradientButton
+                                        label="Marcar completado"
                                         onPress={() => handleUpdateStatus(selectedAppointment.id, 'completed')}
-                                    >
-                                        <Ionicons name="checkmark-circle" size={20} color="white" />
-                                        <Text style={styles.actionBtnText}>Marcar completado</Text>
-                                    </TouchableOpacity>
+                                        icon="checkmark-circle"
+                                        variant="primary"
+                                        style={{ marginTop: 12 }}
+                                    />
                                 )}
 
                                 {(selectedAppointment.status === 'pending' || selectedAppointment.status === 'confirmed') && (

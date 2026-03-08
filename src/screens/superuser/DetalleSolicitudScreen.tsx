@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../config/supabase';
+import { useToast } from '../../hooks/useToast';
 import { SubscriptionRequest } from '../../types';
 
 type Status = 'pending' | 'approved' | 'rejected';
@@ -49,6 +50,7 @@ export default function DetalleSolicitudScreen({ navigation, route }: any) {
     const [currentStatus, setCurrentStatus] = useState<Status>(solicitud.status as Status);
     const [loadingApprove, setLoadingApprove] = useState(false);
     const [loadingReject, setLoadingReject] = useState(false);
+    const { showToast } = useToast();
 
     // Modal rechazo
     const [showRejectModal, setShowRejectModal] = useState(false);
@@ -59,7 +61,7 @@ export default function DetalleSolicitudScreen({ navigation, route }: any) {
 
     const copyToClipboard = (text: string, label: string) => {
         Clipboard.setString(text);
-        Alert.alert('Copiado', `${label} copiado al portapapeles.`);
+        showToast({ type: 'success', message: `${label} copiado al portapapeles.` });
     };
 
     const aprobarSolicitud = async () => {
@@ -87,7 +89,7 @@ export default function DetalleSolicitudScreen({ navigation, route }: any) {
                             setCurrentStatus('approved');
                             setShowManualStepsModal(true);
                         } catch (error: any) {
-                            Alert.alert('Error', error.message ?? 'No se pudo aprobar la solicitud.');
+                            showToast({ type: 'error', message: error.message ?? 'No se pudo aprobar la solicitud.' });
                         } finally {
                             setLoadingApprove(false);
                         }
@@ -99,7 +101,7 @@ export default function DetalleSolicitudScreen({ navigation, route }: any) {
 
     const rechazarSolicitud = async () => {
         if (!motivoRechazo.trim()) {
-            Alert.alert('Campo requerido', 'Por favor ingresa el motivo del rechazo.');
+            showToast({ type: 'warning', message: 'Por favor ingresa el motivo del rechazo.' });
             return;
         }
         setLoadingReject(true);
@@ -117,11 +119,10 @@ export default function DetalleSolicitudScreen({ navigation, route }: any) {
 
             setCurrentStatus('rejected');
             setShowRejectModal(false);
-            Alert.alert('Solicitud rechazada', 'La solicitud fue rechazada correctamente.', [
-                { text: 'OK', onPress: () => navigation.goBack() },
-            ]);
+            showToast({ type: 'success', message: 'La solicitud fue rechazada correctamente.' });
+            navigation.goBack();
         } catch (error: any) {
-            Alert.alert('Error', error.message ?? 'No se pudo rechazar la solicitud.');
+            showToast({ type: 'error', message: error.message ?? 'No se pudo rechazar la solicitud.' });
         } finally {
             setLoadingReject(false);
         }

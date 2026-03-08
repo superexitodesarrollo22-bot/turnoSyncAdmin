@@ -1,219 +1,297 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, StatusBar, Animated } from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Dimensions,
+    Animated,
+    StatusBar,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import * as ExpoSplashScreen from 'expo-splash-screen';
 
 const { width } = Dimensions.get('window');
 
-interface SplashScreenProps {
+interface Props {
     onFinish: () => void;
 }
 
-const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
-    // Refs para animaciones nativas
-    const bgOpacity = useRef(new Animated.Value(0.8)).current;
-    const logoScale = useRef(new Animated.Value(0.3)).current;
+export default function SplashScreen({ onFinish }: Props) {
+    // ── Animated values ────────────────────────────────────────────────────────
+    const bgOpacity = useRef(new Animated.Value(0)).current;
+    const ringOpacity = useRef(new Animated.Value(0)).current;
+    const ringScale = useRef(new Animated.Value(0.7)).current;
+    const logoScale = useRef(new Animated.Value(0)).current;
     const logoOpacity = useRef(new Animated.Value(0)).current;
-    const textTranslateY = useRef(new Animated.Value(20)).current;
-    const textOpacity = useRef(new Animated.Value(0)).current;
+    const titleTranslateY = useRef(new Animated.Value(30)).current;
+    const titleOpacity = useRef(new Animated.Value(0)).current;
+    const adminOpacity = useRef(new Animated.Value(0)).current;
     const taglineOpacity = useRef(new Animated.Value(0)).current;
-    const progressWidth = useRef(new Animated.Value(0)).current;
-    const mainContentOpacity = useRef(new Animated.Value(1)).current;
+    const progressAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
-        // Animaciones de entrada
+        // 1. Fondo
+        Animated.timing(bgOpacity, {
+            toValue: 1,
+            duration: 400,
+            useNativeDriver: true,
+        }).start();
+
+        // 2. Círculo exterior (fade + scale)
         Animated.parallel([
-            Animated.timing(bgOpacity, {
-                toValue: 1,
-                duration: 1000,
-                useNativeDriver: true
-            }),
-            Animated.timing(logoOpacity, {
+            Animated.timing(ringOpacity, {
                 toValue: 1,
                 duration: 400,
-                useNativeDriver: true
+                delay: 200,
+                useNativeDriver: true,
             }),
-            Animated.spring(logoScale, {
+            Animated.timing(ringScale, {
                 toValue: 1,
-                friction: 7,
-                tension: 40,
-                useNativeDriver: true
-            }),
-            Animated.timing(textOpacity, {
-                toValue: 1,
-                duration: 600,
-                delay: 400,
-                useNativeDriver: true
-            }),
-            Animated.timing(textTranslateY, {
-                toValue: 0,
-                duration: 600,
-                delay: 400,
-                useNativeDriver: true
-            }),
-            Animated.timing(taglineOpacity, {
-                toValue: 1,
-                duration: 600,
-                delay: 800,
-                useNativeDriver: true
-            }),
-            Animated.timing(progressWidth, {
-                toValue: width * 0.6,
-                duration: 1200,
-                delay: 1000,
-                useNativeDriver: false // Width no soporta native driver
+                duration: 400,
+                delay: 200,
+                useNativeDriver: true,
             }),
         ]).start();
 
-        // Delay para el fade out final sincronizado con la duración total
-        const timer = setTimeout(() => {
-            Animated.timing(mainContentOpacity, {
-                toValue: 0,
-                duration: 300,
-                useNativeDriver: true
-            }).start(({ finished }) => {
-                if (finished) {
-                    ExpoSplashScreen.hideAsync().catch(() => { });
-                    onFinish();
-                }
-            });
-        }, 2200);
+        // 3. Logo con spring
+        Animated.parallel([
+            Animated.spring(logoScale, {
+                toValue: 1,
+                friction: 6,
+                tension: 50,
+                delay: 300,
+                useNativeDriver: true,
+            }),
+            Animated.timing(logoOpacity, {
+                toValue: 1,
+                duration: 350,
+                delay: 300,
+                useNativeDriver: true,
+            }),
+        ]).start();
 
-        return () => clearTimeout(timer);
+        // 4. "TurnoSync" desliza desde abajo
+        Animated.parallel([
+            Animated.timing(titleTranslateY, {
+                toValue: 0,
+                duration: 450,
+                delay: 600,
+                useNativeDriver: true,
+            }),
+            Animated.timing(titleOpacity, {
+                toValue: 1,
+                duration: 450,
+                delay: 600,
+                useNativeDriver: true,
+            }),
+        ]).start();
+
+        // 5. "ADMIN"
+        Animated.timing(adminOpacity, {
+            toValue: 1,
+            duration: 400,
+            delay: 900,
+            useNativeDriver: true,
+        }).start();
+
+        // 6. Tagline
+        Animated.timing(taglineOpacity, {
+            toValue: 1,
+            duration: 400,
+            delay: 1100,
+            useNativeDriver: true,
+        }).start();
+
+        // 7. Barra de progreso (width → no soporta native driver)
+        Animated.timing(progressAnim, {
+            toValue: 1,
+            duration: 1200,
+            delay: 1200,
+            useNativeDriver: false,
+        }).start(({ finished }) => {
+            if (finished) {
+                // 8. Callback al terminar la barra
+                ExpoSplashScreen.hideAsync().catch(() => { });
+                onFinish();
+            }
+        });
     }, [onFinish]);
+
+    const progressWidth = progressAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 200],
+    });
 
     return (
         <View style={styles.container}>
             <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
 
+            {/* ── Fondo gradiente ── */}
             <Animated.View style={[StyleSheet.absoluteFill, { opacity: bgOpacity }]}>
                 <LinearGradient
-                    colors={['#1A1A2E', '#0F3460']}
+                    colors={['#0F0F1A', '#1A1A2E', '#0F0F1A']}
                     style={StyleSheet.absoluteFill}
+                    locations={[0, 0.5, 1]}
                 />
             </Animated.View>
 
-            <Animated.View style={[styles.content, { opacity: mainContentOpacity }]}>
-                {/* Logo de Calendario Estilizado */}
-                <Animated.View style={[styles.logoContainer, {
-                    opacity: logoOpacity,
-                    transform: [{ scale: logoScale }]
-                }]}>
-                    <View style={styles.calendarBase}>
-                        <View style={styles.calendarHeader} />
-                        <View style={styles.calendarGrid}>
-                            <View style={styles.checkMark} />
-                        </View>
-                    </View>
+            <View style={styles.content}>
+                {/* ── Círculo exterior pulsante ── */}
+                <Animated.View
+                    style={[
+                        styles.ring,
+                        {
+                            opacity: ringOpacity,
+                            transform: [{ scale: ringScale }],
+                        },
+                    ]}
+                />
+
+                {/* ── Logo central ── */}
+                <Animated.View
+                    style={[
+                        styles.logoWrapper,
+                        {
+                            opacity: logoOpacity,
+                            transform: [{ scale: logoScale }],
+                        },
+                    ]}
+                >
+                    <LinearGradient
+                        colors={['#6C63FF', '#00D9A6']}
+                        style={styles.logoGradient}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                    >
+                        <Ionicons name="calendar-outline" size={48} color="#FFFFFF" />
+                    </LinearGradient>
                 </Animated.View>
 
-                {/* Textos */}
-                <Animated.View style={[styles.textContainer, {
-                    opacity: textOpacity,
-                    transform: [{ translateY: textTranslateY }]
-                }]}>
-                    <Text style={styles.appName}>TurnoSync</Text>
-                    <Text style={styles.adminText}>ADMIN</Text>
-                </Animated.View>
+                {/* ── Título "TurnoSync" ── */}
+                <Animated.Text
+                    style={[
+                        styles.appName,
+                        {
+                            opacity: titleOpacity,
+                            transform: [{ translateY: titleTranslateY }],
+                        },
+                    ]}
+                >
+                    TurnoSync
+                </Animated.Text>
 
-                <Animated.View style={[styles.taglineContainer, { opacity: taglineOpacity }]}>
-                    <Text style={styles.tagline}>Gestión profesional de turnos</Text>
-                </Animated.View>
+                {/* ── "ADMIN" ── */}
+                <Animated.Text style={[styles.adminLabel, { opacity: adminOpacity }]}>
+                    ADMIN
+                </Animated.Text>
 
-                {/* Barra de progreso */}
-                <View style={styles.progressBarBackground}>
-                    <Animated.View style={[styles.progressBarFill, { width: progressWidth }]} />
+                {/* ── Tagline ── */}
+                <Animated.Text style={[styles.tagline, { opacity: taglineOpacity }]}>
+                    Gestión profesional de turnos
+                </Animated.Text>
+
+                {/* ── Barra de progreso ── */}
+                <View style={styles.progressTrack}>
+                    <Animated.View style={[styles.progressFillWrapper, { width: progressWidth }]}>
+                        <LinearGradient
+                            colors={['#6C63FF', '#00D9A6']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={StyleSheet.absoluteFill}
+                        />
+                    </Animated.View>
                 </View>
-            </Animated.View>
+            </View>
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#0F0F1A',
     },
     content: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    logoContainer: {
-        width: 100,
-        height: 100,
+
+    // Círculo exterior pulsante
+    ring: {
+        position: 'absolute',
+        width: 160,
+        height: 160,
+        borderRadius: 80,
+        borderWidth: 2,
+        borderColor: '#6C63FF',
+        opacity: 0.4,
+        // sombra iOS
+        shadowColor: '#6C63FF',
+        shadowOffset: { width: 0, height: 0 },
+        shadowRadius: 20,
+        shadowOpacity: 0.5,
+    },
+
+    // Logo
+    logoWrapper: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        marginBottom: 32,
+        // sombra iOS
+        shadowColor: '#6C63FF',
+        shadowOffset: { width: 0, height: 0 },
+        shadowRadius: 20,
+        shadowOpacity: 0.5,
+        // elevación Android
+        elevation: 12,
+    },
+    logoGradient: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
     },
-    calendarBase: {
-        width: 80,
-        height: 80,
-        borderWidth: 4,
-        borderColor: '#E94560',
-        borderRadius: 12,
-        backgroundColor: 'transparent',
-        overflow: 'hidden',
-    },
-    calendarHeader: {
-        width: '100%',
-        height: 18,
-        backgroundColor: '#E94560',
-    },
-    calendarGrid: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    checkMark: {
-        width: 30,
-        height: 15,
-        borderLeftWidth: 4,
-        borderBottomWidth: 4,
-        borderColor: '#E94560',
-        transform: [{ rotate: '-45deg' }],
-        marginTop: -5,
-    },
-    textContainer: {
-        alignItems: 'center',
-        marginBottom: 10,
-    },
+
+    // Textos
     appName: {
-        fontSize: 32,
-        fontWeight: 'bold',
         color: '#FFFFFF',
-        letterSpacing: 1,
+        fontSize: 34,
+        fontWeight: 'bold',
+        letterSpacing: 1.5,
+        marginBottom: 6,
     },
-    adminText: {
-        fontSize: 14,
-        color: '#E94560',
+    adminLabel: {
+        color: '#6C63FF',
+        fontSize: 13,
+        fontWeight: '700',
         letterSpacing: 8,
-        marginTop: 4,
-        fontWeight: '600',
-        marginLeft: 8,
-    },
-    taglineContainer: {
-        marginBottom: 60,
+        marginBottom: 16,
     },
     tagline: {
-        fontSize: 14,
-        color: '#A0A0B0',
+        color: 'rgba(255,255,255,0.45)',
+        fontSize: 13,
         fontWeight: '400',
+        marginBottom: 60,
+        letterSpacing: 0.3,
     },
-    progressBarBackground: {
+
+    // Barra de progreso
+    progressTrack: {
         position: 'absolute',
-        bottom: 100,
-        width: '60%',
-        height: 2,
-        backgroundColor: '#2A2A4A',
-        borderRadius: 1,
+        bottom: 90,
+        width: 200,
+        height: 3,
+        borderRadius: 2,
+        backgroundColor: 'rgba(255,255,255,0.1)',
         overflow: 'hidden',
     },
-    progressBarFill: {
+    progressFillWrapper: {
         height: '100%',
-        backgroundColor: '#E94560',
-        borderRadius: 1,
+        borderRadius: 2,
+        overflow: 'hidden',
     },
 });
-
-export default SplashScreen;

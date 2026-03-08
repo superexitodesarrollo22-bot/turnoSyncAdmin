@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../config/supabase';
+import { useToast } from '../../hooks/useToast';
 
 interface BusinessRow {
     id: string;
@@ -37,6 +38,7 @@ export default function AllBusinessesScreen({ navigation }: any) {
     const [searchText, setSearchText] = useState('');
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const { showToast } = useToast();
 
     const loadBusinesses = useCallback(async () => {
         try {
@@ -133,7 +135,7 @@ export default function AllBusinessesScreen({ navigation }: any) {
                             setBusinesses(updater);
                             setFiltered(updater);
                         } catch (error: any) {
-                            Alert.alert('Error', error.message ?? 'No se pudo actualizar el negocio.');
+                            showToast({ type: 'error', message: error.message ?? 'No se pudo actualizar el negocio.' });
                         }
                     },
                 },

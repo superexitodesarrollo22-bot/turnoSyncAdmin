@@ -19,37 +19,26 @@ import { supabase } from '../../config/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { formatCurrency, getLongDate } from '../../utils/helpers';
 import { Appointment } from '../../types';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { DashboardStatSkeleton, ListScreenSkeleton } from '../../components/ui/SkeletonLoader';
+import AnimatedPressable from '../../components/ui/AnimatedPressable';
+import FadeInView from '../../components/ui/FadeInView';
+import { PremiumCard } from '../../components/ui/PremiumCard';
+import { StatusBadge } from '../../components/ui/StatusBadge';
+import { GradientButton } from '../../components/ui/GradientButton';
 
 const { width } = Dimensions.get('window');
-
-// --- Componentes Skeleton Nativos ---
-const SkeletonItem = ({ style }: { style: any }) => {
-    const opacity = useRef(new NativeAnimated.Value(0.3)).current;
-
-    useEffect(() => {
-        NativeAnimated.loop(
-            NativeAnimated.sequence([
-                NativeAnimated.timing(opacity, { toValue: 0.7, duration: 1000, useNativeDriver: true }),
-                NativeAnimated.timing(opacity, { toValue: 0.3, duration: 1000, useNativeDriver: true }),
-            ])
-        ).start();
-    }, []);
-
-    return <NativeAnimated.View style={[styles.skeleton, style, { opacity }]} />;
-};
 
 const DashboardSkeleton = () => (
     <View style={styles.skeletonContainer}>
         <View style={styles.kpiGrid}>
             {[1, 2, 3, 4].map((i) => (
-                <SkeletonItem key={i} style={styles.kpiCardSkeleton} />
+                <View key={i} style={{ width: (width - 45) / 2 }}>
+                    <DashboardStatSkeleton />
+                </View>
             ))}
         </View>
-        <SkeletonItem style={styles.weeklyCardSkeleton} />
-        <SkeletonItem style={styles.titleSkeleton} />
-        {[1, 2, 3, 4, 5].map((i) => (
-            <SkeletonItem key={i} style={styles.listSkeleton} />
-        ))}
+        <ListScreenSkeleton count={3} />
     </View>
 );
 
@@ -175,13 +164,13 @@ const DashboardScreen = () => {
     };
 
     const renderKPI = (title: string, value: number, label: string, color: string, icon: string) => (
-        <View style={styles.kpiCard}>
+        <PremiumCard style={styles.kpiCard}>
             <View style={[styles.kpiIconBg, { backgroundColor: color + '20' }]}>
                 <Ionicons name={icon as any} size={20} color={color} />
             </View>
             <Text style={[styles.kpiValue, { color }]}>{value}</Text>
             <Text style={styles.kpiLabel}>{label}</Text>
-        </View>
+        </PremiumCard>
     );
 
     return (
@@ -251,7 +240,7 @@ const DashboardScreen = () => {
                         </View>
 
                         {/* KPI Semanal */}
-                        <LinearGradient colors={['#1E1E3A', '#0F3460']} style={styles.weeklyCard}>
+                        <PremiumCard gradient style={styles.weeklyCard}>
                             <View style={styles.weeklyHeader}>
                                 <Text style={styles.weeklyTitle}>ESTA SEMANA</Text>
                                 <Ionicons name="stats-chart" size={18} color="#E94560" />
@@ -265,7 +254,7 @@ const DashboardScreen = () => {
                                 </View>
                                 <Text style={styles.occupancyText}>{stats.weekOccupancy}% de ocupación</Text>
                             </View>
-                        </LinearGradient>
+                        </PremiumCard>
 
                         {/* Próximos Turnos */}
                         <View style={styles.sectionHeader}>
@@ -277,32 +266,31 @@ const DashboardScreen = () => {
 
                         <View style={styles.upcomingList}>
                             {upcomingAppointments.length === 0 ? (
-                                <View style={styles.emptyState}>
-                                    <Ionicons name="calendar-outline" size={48} color="#2A2A4A" />
-                                    <Text style={styles.emptyText}>No hay citas próximas</Text>
+                                <View style={{ minHeight: 180, backgroundColor: '#1E1E3A', borderRadius: 16, borderColor: '#2A2A4A', borderWidth: 1 }}>
+                                    <EmptyState
+                                        icon="calendar-outline"
+                                        title="Sin citas próximas"
+                                    />
                                 </View>
                             ) : (
                                 upcomingAppointments.map((item, index) => (
-                                    <View key={item.id} style={styles.appointmentItem}>
-                                        <View style={styles.timeBox}>
-                                            <Text style={styles.timeText}>
-                                                {new Date(item.start_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </Text>
-                                        </View>
-                                        <View style={styles.appointmentInfo}>
-                                            <Text style={styles.clientName}>{(item as any).users?.full_name || 'Cliente'}</Text>
-                                            <Text style={styles.serviceName}>{(item as any).services?.name} • {(item as any).services?.duration_minutes} min</Text>
-                                            <View style={[
-                                                styles.statusBadge,
-                                                { backgroundColor: item.status === 'pending' ? '#F5A623' : '#2ECC71' }
-                                            ]}>
-                                                <Text style={styles.statusBadgeText}>
-                                                    {item.status === 'pending' ? 'PENDIENTE' : 'CONFIRMADO'}
+                                    <FadeInView delay={index * 80} key={item.id}>
+                                        <PremiumCard style={styles.appointmentItem}>
+                                            <View style={styles.timeBox}>
+                                                <Text style={styles.timeText}>
+                                                    {new Date(item.start_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </Text>
                                             </View>
-                                        </View>
-                                        <Ionicons name="chevron-forward" size={18} color="#2A2A4A" />
-                                    </View>
+                                            <View style={styles.appointmentInfo}>
+                                                <Text style={styles.clientName}>{(item as any).users?.full_name || 'Cliente'}</Text>
+                                                <Text style={styles.serviceName}>{(item as any).services?.name} • {(item as any).services?.duration_minutes} min</Text>
+                                                <View style={{ marginTop: 6 }}>
+                                                    <StatusBadge status={item.status as any} size="sm" />
+                                                </View>
+                                            </View>
+                                            <Ionicons name="chevron-forward" size={18} color="#2A2A4A" />
+                                        </PremiumCard>
+                                    </FadeInView>
                                 ))
                             )}
                         </View>
@@ -426,12 +414,7 @@ const styles = StyleSheet.create({
     quickAccessGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 15, justifyContent: 'space-between' },
     quickAccessBtn: { width: (width - 45) / 2, height: 90, backgroundColor: '#1E1E3A', borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 15 },
     quickAccessLabel: { color: 'white', fontSize: 14, marginTop: 8 },
-    skeletonContainer: { padding: 20 },
-    skeleton: { backgroundColor: '#1E1E3A', borderRadius: 8 },
-    kpiCardSkeleton: { width: (width - 50) / 2, height: 100, marginBottom: 10, borderRadius: 16 },
-    weeklyCardSkeleton: { width: '100%', height: 120, borderRadius: 16, marginBottom: 20 },
-    titleSkeleton: { width: 150, height: 24, marginBottom: 15 },
-    listSkeleton: { width: '100%', height: 80, marginBottom: 10, borderRadius: 12 },
+    skeletonContainer: { paddingTop: 20 },
     onboardingBanner: { marginHorizontal: 20, marginBottom: 25, backgroundColor: 'rgba(245, 166, 35, 0.1)', borderWidth: 1, borderColor: '#F5A623', borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'center' },
     bannerIconBox: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(245, 166, 35, 0.15)', justifyContent: 'center', alignItems: 'center' },
     bannerTitle: { color: 'white', fontSize: 13, fontWeight: 'bold' },

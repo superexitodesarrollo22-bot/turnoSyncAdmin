@@ -4,6 +4,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider } from './src/context/AuthContext';
+import { ToastProvider } from './src/contexts/ToastContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -15,8 +16,10 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <AuthProvider>
-          <StatusBar style="light" backgroundColor="#1A1A2E" translucent />
-          <AppNavigator />
+          <ToastProvider>
+            <StatusBar style="light" backgroundColor="#1A1A2E" translucent />
+            <AppNavigator />
+          </ToastProvider>
         </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

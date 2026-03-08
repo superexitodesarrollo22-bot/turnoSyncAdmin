@@ -20,6 +20,9 @@ import { supabase } from '../../config/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import Toast, { ToastRef } from '../../components/Toast';
 import MiniCalendar from '../../components/MiniCalendar';
+import { GradientHeader } from '../../components/ui/GradientHeader';
+import { PremiumCard } from '../../components/ui/PremiumCard';
+import { GradientButton } from '../../components/ui/GradientButton';
 
 const { width, height } = Dimensions.get('window');
 
@@ -340,9 +343,7 @@ const HorariosScreen = () => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#1A1A2E', '#16213E']} style={styles.headerHeader}>
-                <Text style={styles.headerHeaderTitle}>Horarios y disponibilidad</Text>
-            </LinearGradient>
+            <GradientHeader title="Horarios y disponibilidad" />
 
             <ScrollView contentContainerStyle={styles.scroll}>
                 {/* SECCIÓN 1: HORARIOS SEMANALES */}
@@ -350,9 +351,9 @@ const HorariosScreen = () => {
                     <Text style={styles.sectionTitle}>Días y horarios de atención</Text>
                     <Text style={styles.sectionSubtitle}>Configura qué días y en qué horario atiendes cada semana.</Text>
 
-                    <View style={styles.card}>
+                    <PremiumCard style={styles.card}>
                         {WEEKDAYS.map((_, i) => renderScheduleItem(i))}
-                    </View>
+                    </PremiumCard>
                     {renderSlotPreview()}
                 </View>
 
@@ -475,9 +476,12 @@ const HorariosScreen = () => {
                             <TouchableOpacity onPress={() => setEditDayModal(null)} style={styles.cancelBtn}>
                                 <Text style={styles.cancelText}>Cancelar</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={saveDaySchedule} style={styles.saveModalBtn}>
-                                <Text style={styles.saveModalText}>Guardar</Text>
-                            </TouchableOpacity>
+                            <View style={{ flex: 2 }}>
+                                <GradientButton
+                                    label="Guardar"
+                                    onPress={saveDaySchedule}
+                                />
+                            </View>
                         </View>
                     </View>
                 </View>
@@ -521,13 +525,12 @@ const HorariosScreen = () => {
                                 />
                             </View>
 
-                            <TouchableOpacity
-                                style={[styles.saveModalBtn, { width: '100%', height: 50, marginTop: 20 }, !startDate && { opacity: 0.5 }]}
+                            <GradientButton
+                                label="Bloquear días seleccionados"
                                 onPress={saveBlackout}
                                 disabled={!startDate}
-                            >
-                                <Text style={styles.saveModalText}>Bloquear días seleccionados</Text>
-                            </TouchableOpacity>
+                                style={{ marginTop: 20 }}
+                            />
                         </ScrollView>
                     </View>
                 </View>
