@@ -115,6 +115,20 @@ const LoginScreen = () => {
                 throw new Error('No se pudo encontrar el perfil de usuario');
             }
 
+            // Verificar si es superuser — si lo es, permitir login directo
+            const { data: profileFull } = await supabase
+                .from('users')
+                .select('id, full_name, is_superuser')
+                .eq('supabase_auth_uid', user.id)
+                .single();
+
+            if (profileFull?.is_superuser) {
+                // Superuser: no necesita business_users, dejar que AuthContext maneje
+                console.log('[Login] Superuser detectado, acceso permitido');
+                return;
+            }
+
+            // Usuario normal: verificar que sea admin/owner de un negocio
             const { data: bizUser, error: bizUserError } = await supabase
                 .from('business_users')
                 .select('business_id')
