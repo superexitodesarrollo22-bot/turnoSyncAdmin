@@ -94,6 +94,7 @@ export default function SuperuserDashboardScreen({ navigation }: any) {
             <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" />
             <ScrollView
                 style={styles.container}
+                contentContainerStyle={{ paddingBottom: 80 }}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E94560" />
