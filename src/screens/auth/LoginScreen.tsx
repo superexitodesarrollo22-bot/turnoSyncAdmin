@@ -264,6 +264,16 @@ const LoginScreen = () => {
                         </View>
 
                         <TouchableOpacity
+                            style={{ alignItems: 'center', marginTop: 16, paddingVertical: 8 }}
+                            onPress={() => navigation.navigate('Register' as never)}
+                        >
+                            <Text style={{ color: '#A0A0B0', fontSize: 14 }}>
+                                ¿No tenés cuenta?{' '}
+                                <Text style={{ color: '#E94560', fontWeight: '700' }}>Crear cuenta</Text>
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
                             style={styles.subscribeButton}
                             onPress={() => navigation.navigate('Suscripcion')}
                         >

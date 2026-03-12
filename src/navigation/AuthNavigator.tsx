@@ -7,6 +7,7 @@ import SuscripcionScreen from '../screens/auth/SuscripcionScreen';
 import NuevaPasswordScreen from '../screens/auth/NuevaPasswordScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import { useOnboarding } from '../hooks/useOnboarding';
+import RegisterScreen from '../screens/auth/RegisterScreen';
 
 const Stack = createStackNavigator();
 
@@ -56,6 +57,11 @@ const AuthNavigator = () => {
             <Stack.Screen
                 name="NuevaPassword"
                 component={NuevaPasswordScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Register"
+                component={RegisterScreen}
                 options={{ headerShown: false }}
             />
         </Stack.Navigator>

@@ -27,6 +27,11 @@ export async function registerForPushNotifications(
         return null;
     }
 
+    if (isExpoGo) {
+        console.log('[Push] Expo Go: remote push no disponible desde SDK 53. Usa un Development Build.');
+        return null;
+    }
+
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
 
