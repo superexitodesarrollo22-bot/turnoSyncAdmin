@@ -136,10 +136,12 @@ const SuscripcionScreen = () => {
         setLoading(true);
 
         try {
-            const { data: existing, error: checkError } = await supabase
+            // Verificar si ya existe solicitud con ese email
+            // (el error de SELECT se ignora intencionalmente si RLS lo bloquea)
+            const { data: existing } = await supabase
                 .from('subscription_requests')
                 .select('id, status')
-                .eq('admin_email', adminEmail)
+                .eq('admin_email', adminEmail.trim().toLowerCase())
                 .maybeSingle();
 
             if (existing) {
@@ -148,7 +150,7 @@ const SuscripcionScreen = () => {
                     setLoading(false);
                     return;
                 } else if (existing.status === 'approved') {
-                    setErrorMsg('Este correo ya tiene una cuenta activa. Inicia sesión.');
+                    setErrorMsg('Este correo ya tiene una cuenta activa. Inicia sesion.');
                     setLoading(false);
                     return;
                 }
@@ -157,24 +159,34 @@ const SuscripcionScreen = () => {
             const { error: insertError } = await supabase
                 .from('subscription_requests')
                 .insert({
-                    admin_full_name: adminName,
-                    admin_email: adminEmail,
-                    admin_phone: adminPhone,
-                    company_name: companyName,
-                    company_address: companyAddress,
-                    company_phone: companyPhone,
-                    company_description: companyDesc,
+                    admin_full_name: adminName.trim(),
+                    admin_email: adminEmail.trim().toLowerCase(),
+                    admin_phone: adminPhone.trim(),
+                    company_name: companyName.trim(),
+                    company_address: companyAddress.trim(),
+                    company_phone: companyPhone.trim(),
+                    company_description: companyDesc.trim(),
                     company_type: companyType,
                     estimated_monthly_appointments: monthlyApps,
-                    status: 'pending'
+                    status: 'pending',
                 });
 
-            if (insertError) throw insertError;
+            if (insertError) {
+                console.error('[Suscripcion] Insert error:', insertError.message, insertError.code);
+                if (insertError.code === '23505') {
+                    setErrorMsg('Ya existe una solicitud con este correo electronico.');
+                } else {
+                    setErrorMsg('Error al enviar la solicitud: ' + insertError.message);
+                }
+                return;
+            }
 
+            console.log('[Suscripcion] Solicitud enviada correctamente');
             setSubmitted(true);
+
         } catch (error: any) {
-            console.error('Error enviando solicitud:', error.message);
-            setErrorMsg('Ocurrió un error al enviar la solicitud. Intenta más tarde.');
+            console.error('[Suscripcion] Excepcion inesperada:', error.message);
+            setErrorMsg('Ocurrio un error inesperado. Intenta de nuevo.');
         } finally {
             setLoading(false);
         }
