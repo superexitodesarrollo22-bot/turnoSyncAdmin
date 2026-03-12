@@ -28,7 +28,7 @@ export async function registerForPushNotifications(
     }
 
     if (isExpoGo) {
-        console.log('[Push] Expo Go: remote push no disponible desde SDK 53.');
+        console.log('[Push] Expo Go: remote push no disponible SDK53+.');
         return null;
     }
 
