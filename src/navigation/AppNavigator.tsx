@@ -120,6 +120,8 @@ const AppNavigator = () => {
 
     // Manejo de Notificaciones
     useEffect(() => {
+        if (isExpoGo) return;
+
         // Listener: usuario TOCA la notificación (app cerrada o en background)
         const responseSubscription = Notifications.addNotificationResponseReceivedListener(response => {
             const data = response.notification.request.content.data;
