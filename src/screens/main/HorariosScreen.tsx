@@ -55,6 +55,10 @@ const HorariosScreen = () => {
     const [endDate, setEndDate] = useState('');
     const [reason, setReason] = useState('');
 
+    // Modal confirmar cierre de día
+    const [closeDayModal, setCloseDayModal] = useState(false);
+    const [closeDayWeekday, setCloseDayWeekday] = useState<number | null>(null);
+
     const fetchData = useCallback(async () => {
         if (!business) return;
         setLoading(true);
@@ -92,31 +96,9 @@ const HorariosScreen = () => {
         if (!business || !userProfile) return;
 
         if (!active) {
-            // Intentar cerrar
-            Alert.alert(
-                `¿Cerrar ${WEEKDAYS[weekday]}?`,
-                'Los clientes no podrán agendar para este día. Los turnos ya existentes no se cancelarán.',
-                [
-                    { text: 'Cancelar', style: 'cancel' },
-                    {
-                        text: 'Cerrar día',
-                        style: 'destructive',
-                        onPress: async () => {
-                            const { error } = await supabase
-                                .from('schedules')
-                                .delete()
-                                .eq('business_id', business.id)
-                                .eq('weekday', weekday);
-
-                            if (!error) {
-                                setSchedules(prev => prev.filter(s => s.weekday !== weekday));
-                                toastRef.current?.show(`${WEEKDAYS[weekday]} cerrado`, 'info');
-                                logAction('day_closed', { weekday });
-                            }
-                        }
-                    }
-                ]
-            );
+            // Mostrar modal personalizado en lugar de Alert nativo
+            setCloseDayWeekday(weekday);
+            setCloseDayModal(true);
         } else {
             // Activar con horario default
             const { data, error } = await supabase
@@ -135,6 +117,25 @@ const HorariosScreen = () => {
                 toastRef.current?.show(`${WEEKDAYS[weekday]} activado`, 'success');
                 logAction('day_opened', { weekday });
             }
+        }
+    };
+
+    const confirmCloseDay = async () => {
+        if (closeDayWeekday === null || !business || !userProfile) return;
+        const weekday = closeDayWeekday;
+        setCloseDayModal(false);
+        setCloseDayWeekday(null);
+
+        const { error } = await supabase
+            .from('schedules')
+            .delete()
+            .eq('business_id', business.id)
+            .eq('weekday', weekday);
+
+        if (!error) {
+            setSchedules(prev => prev.filter(s => s.weekday !== weekday));
+            toastRef.current?.show(`${WEEKDAYS[weekday]} cerrado`, 'info');
+            logAction('day_closed', { weekday });
         }
     };
 
@@ -425,6 +426,40 @@ const HorariosScreen = () => {
                 </View>
             </ScrollView>
 
+            {/* Modal Confirmar Cierre de Día */}
+            <Modal visible={closeDayModal} transparent animationType="fade">
+                <View style={styles.modalOverlay}>
+                    <View style={styles.confirmModalContent}>
+                        <View style={styles.confirmModalIcon}>
+                            <Ionicons name="warning-outline" size={36} color="#F5A623" />
+                        </View>
+                        <Text style={styles.confirmModalTitle}>
+                            ¿Cerrar {closeDayWeekday !== null ? WEEKDAYS[closeDayWeekday] : ''}?
+                        </Text>
+                        <Text style={styles.confirmModalBody}>
+                            Los clientes no podrán agendar para este día. Los turnos ya existentes no se cancelarán.
+                        </Text>
+                        <View style={styles.confirmModalBtns}>
+                            <TouchableOpacity
+                                style={styles.confirmCancelBtn}
+                                onPress={() => {
+                                    setCloseDayModal(false);
+                                    setCloseDayWeekday(null);
+                                }}
+                            >
+                                <Text style={styles.confirmCancelText}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.confirmDestructiveBtn}
+                                onPress={confirmCloseDay}
+                            >
+                                <Text style={styles.confirmDestructiveText}>Cerrar día</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
             {/* Modal Editar Horario */}
             <Modal visible={!!editDayModal} transparent animationType="fade">
                 <View style={styles.modalOverlay}>
@@ -600,6 +635,71 @@ const styles = StyleSheet.create({
     label: { color: 'white', fontSize: 14, fontWeight: 'bold', marginBottom: 10 },
     inputGroup: { marginTop: 20 },
     input: { backgroundColor: '#16213E', borderRadius: 12, paddingHorizontal: 16, height: 50, color: 'white', borderWidth: 1, borderColor: '#2A2A4A' },
+    // Confirm modal
+    confirmModalContent: {
+        backgroundColor: '#1E1E3A',
+        borderRadius: 20,
+        padding: 28,
+        marginHorizontal: 30,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#2A2A4A',
+    },
+    confirmModalIcon: {
+        width: 72,
+        height: 72,
+        borderRadius: 36,
+        backgroundColor: 'rgba(245, 166, 35, 0.12)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    confirmModalTitle: {
+        color: '#FFFFFF',
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 10,
+    },
+    confirmModalBody: {
+        color: '#A0A0B0',
+        fontSize: 14,
+        textAlign: 'center',
+        lineHeight: 20,
+        marginBottom: 28,
+    },
+    confirmModalBtns: {
+        flexDirection: 'row',
+        width: '100%',
+        gap: 12,
+    },
+    confirmCancelBtn: {
+        flex: 1,
+        height: 48,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#3A3A5A',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    confirmCancelText: {
+        color: '#A0A0B0',
+        fontSize: 15,
+        fontWeight: '600',
+    },
+    confirmDestructiveBtn: {
+        flex: 1,
+        height: 48,
+        borderRadius: 12,
+        backgroundColor: '#E94560',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    confirmDestructiveText: {
+        color: '#FFFFFF',
+        fontSize: 15,
+        fontWeight: 'bold',
+    },
 });
 
 export default HorariosScreen;

@@ -33,7 +33,7 @@ const TIMEZONES = [
 ];
 
 const PerfilScreen = ({ navigation }: any) => {
-    const { userProfile, business, signOut, refreshBusiness } = useAuth();
+    const { userProfile, business, signOut, refreshBusiness, session } = useAuth();
     const toastRef = useRef<ToastRef>(null);
 
     // States Personal
@@ -51,7 +51,6 @@ const PerfilScreen = ({ navigation }: any) => {
 
     // States Password Modal
     const [passModalVisible, setPassModalVisible] = useState(false);
-    const [currentPass, setCurrentPass] = useState('');
     const [newPass, setNewPass] = useState('');
     const [confirmPass, setConfirmPass] = useState('');
 
@@ -314,7 +313,14 @@ const PerfilScreen = ({ navigation }: any) => {
                         <MenuItem
                             icon="key-outline"
                             title="Cambiar contraseña"
-                            onPress={() => setPassModalVisible(true)}
+                            onPress={() => {
+                                const provider = session?.user?.app_metadata?.provider;
+                                if (provider && provider !== 'email') {
+                                    Alert.alert('No disponible', 'Tu cuenta usa ' + provider + '. Cambia tu contraseña desde esa plataforma.');
+                                    return;
+                                }
+                                setPassModalVisible(true);
+                            }}
                         />
                         <View style={styles.divider} />
                         <MenuItem

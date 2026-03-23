@@ -488,11 +488,6 @@ const ServiciosScreen = () => {
             <LinearGradient colors={['#1A1A2E', '#16213E']} style={styles.header}>
                 <View style={styles.headerTitleRow}>
                     <Text style={styles.headerTitle}>Gestión</Text>
-                    <TouchableOpacity
-                        onPress={() => activeTab === 'servicios' ? handleOpenServiceModal() : handleOpenStaffModal()}
-                    >
-                        <Ionicons name="add-circle" size={32} color="#E94560" />
-                    </TouchableOpacity>
                 </View>
 
                 {/* Tabs internas */}
