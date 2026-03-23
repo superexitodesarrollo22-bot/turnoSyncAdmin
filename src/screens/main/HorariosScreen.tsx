@@ -461,10 +461,14 @@ const HorariosScreen = () => {
             </Modal>
 
             {/* Modal Editar Horario */}
-            <Modal visible={!!editDayModal} transparent animationType="fade">
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
+            <Modal visible={!!editDayModal} transparent animationType="slide">
+                <View style={styles.modalOverlayBottom}>
+                    <View style={styles.modalContentBottom}>
+                        <View style={styles.bottomSheetHandle} />
                         <Text style={styles.modalTitle}>Editar {WEEKDAYS[editDayModal?.weekday]}</Text>
+                        <Text style={styles.modalSubtitleSmall}>
+                            Selecciona la hora de apertura y cierre
+                        </Text>
 
                         <View style={styles.timePickersRow}>
                             <View style={styles.timeCol}>
@@ -616,18 +620,44 @@ const styles = StyleSheet.create({
     // Modal Styles
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', padding: 20 },
     modalContent: { backgroundColor: '#1E1E3A', borderRadius: 24, padding: 24 },
-    modalTitle: { color: 'white', fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 },
-    timePickersRow: { flexDirection: 'row', height: 250, marginBottom: 24 },
+    modalTitle: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 16,
+    },
+    timePickersRow: {
+        flexDirection: 'row',
+        marginBottom: 20,
+        gap: 12,
+    },
     timeCol: { flex: 1, paddingHorizontal: 10 },
     timeLabel: { color: '#A0A0B0', fontSize: 12, textAlign: 'center', marginBottom: 10, fontWeight: 'bold' },
-    timeList: { flex: 1, backgroundColor: '#16213E', borderRadius: 12 },
+    timeList: {
+        height: 260,
+        backgroundColor: '#16213E',
+        borderRadius: 12,
+    },
     timeOption: { paddingVertical: 12, alignItems: 'center' },
     timeOptionActive: { backgroundColor: '#E94560' },
     timeOptionText: { color: '#A0A0B0', fontSize: 16 },
     timeActiveText: { color: 'white', fontWeight: 'bold' },
-    modalBtns: { flexDirection: 'row', justifyContent: 'space-between' },
-    cancelBtn: { flex: 1, height: 50, justifyContent: 'center', alignItems: 'center' },
-    cancelText: { color: '#A0A0B0', fontSize: 16 },
+    modalBtns: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 16,
+        gap: 12,
+    },
+    cancelBtn: {
+        flex: 1,
+        height: 52,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#2A2A4A',
+        borderRadius: 14,
+    },
+    cancelText: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
     saveModalBtn: { flex: 2, height: 50, backgroundColor: '#E94560', borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
     saveModalText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
     modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
@@ -699,6 +729,33 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 15,
         fontWeight: 'bold',
+    },
+    modalOverlayBottom: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        justifyContent: 'flex-end',
+    },
+    modalContentBottom: {
+        backgroundColor: '#1E1E3A',
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        padding: 24,
+        paddingBottom: 36,
+    },
+    bottomSheetHandle: {
+        width: 40,
+        height: 4,
+        backgroundColor: '#3A3A5A',
+        borderRadius: 2,
+        alignSelf: 'center',
+        marginBottom: 20,
+    },
+    modalSubtitleSmall: {
+        color: '#A0A0B0',
+        fontSize: 13,
+        textAlign: 'center',
+        marginBottom: 20,
+        marginTop: -12,
     },
 });
 

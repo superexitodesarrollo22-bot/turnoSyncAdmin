@@ -50,9 +50,6 @@ const PerfilScreen = ({ navigation }: any) => {
     const [isLoading, setIsLoading] = useState(false);
 
     // States Password Modal
-    const [passModalVisible, setPassModalVisible] = useState(false);
-    const [newPass, setNewPass] = useState('');
-    const [confirmPass, setConfirmPass] = useState('');
 
     // Checks for changes
     const hasPersonalChanges = fullName !== userProfile?.full_name;
@@ -119,30 +116,6 @@ const PerfilScreen = ({ navigation }: any) => {
         }
     };
 
-    const handleChangePassword = async () => {
-        if (newPass !== confirmPass) {
-            toastRef.current?.show('Las contraseñas no coinciden', 'error');
-            return;
-        }
-        if (newPass.length < 6) {
-            toastRef.current?.show('Mínimo 6 caracteres', 'error');
-            return;
-        }
-
-        setIsLoading(true);
-        try {
-            const { error } = await supabase.auth.updateUser({ password: newPass });
-            if (error) throw error;
-            toastRef.current?.show('Contraseña actualizada', 'success');
-            setPassModalVisible(false);
-            setNewPass('');
-            setConfirmPass('');
-        } catch (error: any) {
-            toastRef.current?.show(error.message, 'error');
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     const handleSignOut = () => {
         Alert.alert(
@@ -311,19 +284,6 @@ const PerfilScreen = ({ navigation }: any) => {
                         />
                         <View style={styles.divider} />
                         <MenuItem
-                            icon="key-outline"
-                            title="Cambiar contraseña"
-                            onPress={() => {
-                                const provider = session?.user?.app_metadata?.provider;
-                                if (provider && provider !== 'email') {
-                                    Alert.alert('No disponible', 'Tu cuenta usa ' + provider + '. Cambia tu contraseña desde esa plataforma.');
-                                    return;
-                                }
-                                setPassModalVisible(true);
-                            }}
-                        />
-                        <View style={styles.divider} />
-                        <MenuItem
                             icon="document-text-outline"
                             title="Términos y condiciones"
                             onPress={() => Alert.alert('Términos', 'Contenido de los términos y condiciones de la plataforma.')}
@@ -345,45 +305,6 @@ const PerfilScreen = ({ navigation }: any) => {
                 </View>
             </ScrollView>
 
-            {/* Modal Cambio Contraseña */}
-            <Modal visible={passModalVisible} transparent animationType="fade">
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
-                        <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>Nueva Contraseña</Text>
-                            <TouchableOpacity onPress={() => setPassModalVisible(false)}>
-                                <Ionicons name="close" size={24} color="#A0A0B0" />
-                            </TouchableOpacity>
-                        </View>
-
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Nueva contraseña"
-                            placeholderTextColor="#606080"
-                            secureTextEntry
-                            value={newPass}
-                            onChangeText={setNewPass}
-                        />
-                        <View style={{ height: 15 }} />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Confirmar nueva contraseña"
-                            placeholderTextColor="#606080"
-                            secureTextEntry
-                            value={confirmPass}
-                            onChangeText={setConfirmPass}
-                        />
-
-                        <TouchableOpacity
-                            style={[styles.saveBtn, { marginTop: 25 }]}
-                            onPress={handleChangePassword}
-                            disabled={isLoading}
-                        >
-                            {isLoading ? <ActivityIndicator color="white" /> : <Text style={styles.saveBtnText}>Actualizar contraseña</Text>}
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
 
             <Toast ref={toastRef} />
         </KeyboardAvoidingView>
