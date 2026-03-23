@@ -143,11 +143,11 @@ const TurnosScreen = ({ navigation }: any) => {
             const { data, error } = await supabase
                 .from('appointments')
                 .select(`
-                    id, start_at, end_at, status, price_cents, notes, created_at,
-                    users:client_user_id(id, full_name, email),
-                    services(id, name, duration_minutes),
-                    staff(id, name, specialty, photo_url)
-                `)
+            id, start_at, end_at, status, price_cents, notes, created_at,
+            users:client_user_id(id, full_name, email),
+            services(id, name, duration_minutes),
+            staff(id, name, specialty, photo_url)
+        `)
                 .eq('id', id)
                 .eq('business_id', business!.id)
                 .single();
@@ -347,7 +347,7 @@ const TurnosScreen = ({ navigation }: any) => {
         const service = (item as any).services;
 
         return (
-            <FadeInView delay={index * 80} style={{ marginBottom: 12 }}>
+            <FadeInView delay={index * 80} style={{ marginBottom: 8 }}>
                 <PremiumCard
                     style={[styles.appointmentCard, isCancelled ? { opacity: 0.6 } : {}, { padding: 0 }]}
                     onPress={() => setSelectedAppointment(item)}
@@ -597,11 +597,17 @@ const TurnosScreen = ({ navigation }: any) => {
                                 <Text style={styles.sheetSectionTitle}>Cliente</Text>
                                 <View style={styles.clientInfoCard}>
                                     <View style={styles.clientAvatarMini}>
-                                        <Text style={styles.clientAvatarText}>{client?.full_name?.charAt(0)}</Text>
+                                        <Text style={styles.clientAvatarText}>
+                                            {client?.full_name?.charAt(0)?.toUpperCase() ?? '?'}
+                                        </Text>
                                     </View>
                                     <View style={{ flex: 1, marginLeft: 12 }}>
-                                        <Text style={styles.detailValue}>{client?.full_name}</Text>
-                                        <Text style={styles.detailSubValue}>{client?.email}</Text>
+                                        <Text style={styles.detailValue}>
+                                            {client?.full_name ?? 'Cliente sin nombre'}
+                                        </Text>
+                                        <Text style={styles.detailSubValue}>
+                                            {client?.email ?? 'Sin correo registrado'}
+                                        </Text>
                                     </View>
                                     <TouchableOpacity style={styles.copyBtn}>
                                         <Ionicons name="copy-outline" size={18} color="#4A9FFF" />
@@ -833,8 +839,8 @@ const styles = StyleSheet.create({
     funnelBtn: { padding: 4 },
     filterBadge: { position: 'absolute', top: 0, right: 0, width: 8, height: 8, borderRadius: 4, backgroundColor: '#4A9FFF', borderWidth: 1, borderColor: '#1A1A2E' },
     content: { flex: 1 },
-    listContent: { paddingHorizontal: 20, paddingBottom: 40 },
-    appointmentCard: { flexDirection: 'row', backgroundColor: '#1E1E3A', borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: '#2A2A4A' },
+    listContent: { paddingHorizontal: 20, paddingBottom: 100 },
+    appointmentCard: { flexDirection: 'row', backgroundColor: '#1E1E3A', borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: '#2A2A4A', marginBottom: 8 },
     statusBand: { width: 6, height: '100%' },
     cardContent: { flex: 1, padding: 12 },
     cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
@@ -857,7 +863,7 @@ const styles = StyleSheet.create({
     notesText: { color: '#A0A0B0', fontSize: 12, fontStyle: 'italic' },
     emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 100 },
     emptyTitle: { color: '#404060', fontSize: 18, marginTop: 15, fontWeight: 'bold' },
-    weekContainer: { flex: 1 },
+    weekContainer: { flex: 1, paddingBottom: 80 },
     weekDaysGrid: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20, marginBottom: 15 },
     weekDayBtn: { width: (width - 60) / 7, height: 65, justifyContent: 'center', alignItems: 'center', borderRadius: 12, backgroundColor: '#1E1E3A' },
     weekDayBtnActive: { backgroundColor: '#E94560' },
@@ -866,7 +872,7 @@ const styles = StyleSheet.create({
     weekDayNum: { color: 'white', fontSize: 16, fontWeight: 'bold' },
     weekDayNumActive: { color: 'white' },
     dot: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#E94560', marginTop: 4 },
-    timelineScroll: { flex: 1, paddingHorizontal: 20 },
+    timelineScroll: { flex: 1, paddingHorizontal: 20, paddingBottom: 80 },
     timelineRow: { flexDirection: 'row', height: 80 },
     timelineTime: { width: 60, paddingVertical: 10, borderRightWidth: 1, borderRightColor: '#2A2A4A' },
     timelineTimeText: { color: '#606070', fontSize: 12, fontWeight: 'bold' },
