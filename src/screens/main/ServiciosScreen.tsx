@@ -394,86 +394,90 @@ const ServiciosScreen = () => {
 
     // --- RENDER ITEMS ---
     const renderServiceItem = ({ item, index }: { item: Service, index: number }) => (
-        <FadeInView delay={index * 80}>
+        <FadeInView delay={index * 60}>
             <AnimatedPressable style={styles.card}>
-                <View style={styles.cardHeader}>
-                    <View style={styles.iconContainer}>
-                        <Ionicons name="cut-outline" size={24} color="#E94560" />
+                <View style={[styles.cardAccent, { backgroundColor: item.active ? '#2ECC71' : '#3A3A5A' }]} />
+                <View style={styles.cardInner}>
+                    <View style={styles.cardHeader}>
+                        <View style={styles.iconContainer}>
+                            <Ionicons name="cut-outline" size={18} color="#E94560" />
+                        </View>
+                        <View style={styles.cardMain}>
+                            <Text style={styles.cardTitle}>{item.name}</Text>
+                            <Text style={styles.cardSubtitle}>
+                                {item.duration_minutes} min • {formatCurrency(item.price_cents)}
+                            </Text>
+                        </View>
+                        <View style={styles.cardRight}>
+                            <Switch
+                                value={item.active}
+                                onValueChange={() => handleToggleServiceActive(item)}
+                                trackColor={{ false: '#3A3A5A', true: '#2ECC71' }}
+                                thumbColor={Platform.OS === 'android' ? '#FFFFFF' : ''}
+                                style={styles.switch}
+                            />
+                        </View>
                     </View>
-                    <View style={styles.cardMain}>
-                        <Text style={styles.cardTitle}>{item.name}</Text>
-                        <Text style={styles.cardSubtitle}>
-                            {item.duration_minutes} min • {formatCurrency(item.price_cents)}
-                        </Text>
-                    </View>
-                    <View style={styles.cardRight}>
-                        <View style={[
-                            styles.statusBadge,
-                            { backgroundColor: item.active ? 'rgba(46, 204, 113, 0.2)' : 'rgba(160, 160, 176, 0.2)' }
-                        ]}>
-                            <Text style={[styles.statusText, { color: item.active ? '#2ECC71' : '#A0A0B0' }]}>
+                    <View style={styles.cardActions}>
+                        <TouchableOpacity style={styles.actionBtn} onPress={() => handleOpenServiceModal(item)}>
+                            <Ionicons name="pencil-outline" size={18} color="#4A9FFF" />
+                            <Text style={styles.actionBtnText}>Editar</Text>
+                        </TouchableOpacity>
+                        <View style={styles.actionDivider} />
+                        <TouchableOpacity style={styles.actionBtn} onPress={() => handleDeleteService(item)}>
+                            <Ionicons name="trash-outline" size={18} color="#E94560" />
+                            <Text style={[styles.actionBtnText, { color: '#E94560' }]}>Eliminar</Text>
+                        </TouchableOpacity>
+                        <View style={styles.statusPill}>
+                            <Text style={[styles.statusPillText, { color: item.active ? '#2ECC71' : '#A0A0B0' }]}>
                                 {item.active ? 'ACTIVO' : 'INACTIVO'}
                             </Text>
                         </View>
-                        <Switch
-                            value={item.active}
-                            onValueChange={() => handleToggleServiceActive(item)}
-                            trackColor={{ false: '#3A3A5A', true: '#2ECC71' }}
-                            thumbColor={Platform.OS === 'android' ? '#FFFFFF' : ''}
-                        />
                     </View>
-                </View>
-                <View style={styles.cardActions}>
-                    <TouchableOpacity style={styles.actionBtn} onPress={() => handleOpenServiceModal(item)}>
-                        <Ionicons name="pencil-outline" size={18} color="#4A9FFF" />
-                        <Text style={styles.actionBtnText}>Editar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionBtn} onPress={() => handleDeleteService(item)}>
-                        <Ionicons name="trash-outline" size={18} color="#E94560" />
-                        <Text style={[styles.actionBtnText, { color: '#E94560' }]}>Eliminar</Text>
-                    </TouchableOpacity>
                 </View>
             </AnimatedPressable>
         </FadeInView>
     );
 
     const renderStaffItem = ({ item, index }: { item: Staff, index: number }) => (
-        <FadeInView delay={index * 80}>
+        <FadeInView delay={index * 60}>
             <AnimatedPressable style={styles.card}>
-                <View style={styles.cardHeader}>
-                    <View style={[styles.avatarCircle, { backgroundColor: getAvatarColor(item.name) }]}>
-                        <Text style={styles.avatarText}>{getInitials(item.name)}</Text>
+                <View style={[styles.cardAccent, { backgroundColor: item.active ? '#4A9FFF' : '#3A3A5A' }]} />
+                <View style={styles.cardInner}>
+                    <View style={styles.cardHeader}>
+                        <View style={[styles.avatarCircle, { backgroundColor: getAvatarColor(item.name) }]}>
+                            <Text style={styles.avatarText}>{getInitials(item.name)}</Text>
+                        </View>
+                        <View style={styles.cardMain}>
+                            <Text style={styles.cardTitle}>{item.name}</Text>
+                            <Text style={styles.cardSubtitle}>{item.specialty || 'Sin especialidad'}</Text>
+                        </View>
+                        <View style={styles.cardRight}>
+                            <Switch
+                                value={item.active}
+                                onValueChange={() => handleToggleStaffActive(item)}
+                                trackColor={{ false: '#3A3A5A', true: '#2ECC71' }}
+                                thumbColor={Platform.OS === 'android' ? '#FFFFFF' : ''}
+                                style={styles.switch}
+                            />
+                        </View>
                     </View>
-                    <View style={styles.cardMain}>
-                        <Text style={styles.cardTitle}>{item.name}</Text>
-                        <Text style={styles.cardSubtitle}>{item.specialty || 'Sin especialidad'}</Text>
-                    </View>
-                    <View style={styles.cardRight}>
-                        <View style={[
-                            styles.statusBadge,
-                            { backgroundColor: item.active ? 'rgba(46, 204, 113, 0.2)' : 'rgba(160, 160, 176, 0.2)' }
-                        ]}>
-                            <Text style={[styles.statusText, { color: item.active ? '#2ECC71' : '#A0A0B0' }]}>
+                    <View style={styles.cardActions}>
+                        <TouchableOpacity style={styles.actionBtn} onPress={() => handleOpenStaffModal(item)}>
+                            <Ionicons name="pencil-outline" size={18} color="#4A9FFF" />
+                            <Text style={styles.actionBtnText}>Editar</Text>
+                        </TouchableOpacity>
+                        <View style={styles.actionDivider} />
+                        <TouchableOpacity style={styles.actionBtn} onPress={() => handleDeleteStaff(item)}>
+                            <Ionicons name="trash-outline" size={18} color="#E94560" />
+                            <Text style={[styles.actionBtnText, { color: '#E94560' }]}>Eliminar</Text>
+                        </TouchableOpacity>
+                        <View style={styles.statusPill}>
+                            <Text style={[styles.statusPillText, { color: item.active ? '#2ECC71' : '#A0A0B0' }]}>
                                 {item.active ? 'ACTIVO' : 'INACTIVO'}
                             </Text>
                         </View>
-                        <Switch
-                            value={item.active}
-                            onValueChange={() => handleToggleStaffActive(item)}
-                            trackColor={{ false: '#3A3A5A', true: '#2ECC71' }}
-                            thumbColor={Platform.OS === 'android' ? '#FFFFFF' : ''}
-                        />
                     </View>
-                </View>
-                <View style={styles.cardActions}>
-                    <TouchableOpacity style={styles.actionBtn} onPress={() => handleOpenStaffModal(item)}>
-                        <Ionicons name="pencil-outline" size={18} color="#4A9FFF" />
-                        <Text style={styles.actionBtnText}>Editar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionBtn} onPress={() => handleDeleteStaff(item)}>
-                        <Ionicons name="trash-outline" size={18} color="#E94560" />
-                        <Text style={[styles.actionBtnText, { color: '#E94560' }]}>Eliminar</Text>
-                    </TouchableOpacity>
                 </View>
             </AnimatedPressable>
         </FadeInView>
@@ -713,21 +717,92 @@ const styles = StyleSheet.create({
     tabTextActive: { color: 'white' },
     content: { flex: 1 },
     loadingCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    listContainer: { padding: 15, paddingBottom: 100 },
-    card: { backgroundColor: '#1E1E3A', borderRadius: 20, padding: 16, marginBottom: 15, borderWidth: 1, borderColor: '#2A2A4A' },
+    listContainer: { padding: 12, paddingBottom: 100 },
+    card: {
+        backgroundColor: '#1E1E3A',
+        borderRadius: 12,
+        marginBottom: 8,
+        borderWidth: 1,
+        borderColor: '#2A2A4A',
+        flexDirection: 'row',
+        overflow: 'hidden',
+    },
+    cardAccent: {
+        width: 4,
+        borderTopLeftRadius: 12,
+        borderBottomLeftRadius: 12,
+    },
+    cardInner: {
+        flex: 1,
+        paddingHorizontal: 10,
+        paddingTop: 10,
+        paddingBottom: 6,
+    },
     cardHeader: { flexDirection: 'row', alignItems: 'center' },
-    iconContainer: { width: 50, height: 50, borderRadius: 15, backgroundColor: 'rgba(233, 69, 96, 0.1)', justifyContent: 'center', alignItems: 'center', marginRight: 15 },
-    avatarCircle: { width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
-    avatarText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
+    iconContainer: {
+        width: 34,
+        height: 34,
+        borderRadius: 10,
+        backgroundColor: 'rgba(233, 69, 96, 0.12)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
+    },
+    avatarCircle: {
+        width: 34,
+        height: 34,
+        borderRadius: 17,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
+    },
+    avatarText: { color: 'white', fontSize: 13, fontWeight: 'bold' },
     cardMain: { flex: 1 },
-    cardTitle: { color: 'white', fontSize: 17, fontWeight: 'bold' },
-    cardSubtitle: { color: '#A0A0B0', fontSize: 14, marginTop: 4 },
+    cardTitle: { color: 'white', fontSize: 14, fontWeight: '700' },
+    cardSubtitle: { color: '#A0A0B0', fontSize: 12, marginTop: 1 },
     cardRight: { alignItems: 'flex-end' },
+    switch: {
+        transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }],
+    },
     statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, marginBottom: 8 },
     statusText: { fontSize: 10, fontWeight: 'bold' },
-    cardActions: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: '#2A2A4A', marginTop: 15, paddingTop: 15 },
-    actionBtn: { flexDirection: 'row', alignItems: 'center', marginRight: 30 },
-    actionBtnText: { color: '#4A9FFF', fontSize: 14, fontWeight: '600', marginLeft: 8 },
+    cardActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderTopWidth: 1,
+        borderTopColor: '#2A2A4A',
+        paddingTop: 6,
+    },
+    actionBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 2,
+        paddingHorizontal: 4,
+    },
+    actionBtnText: {
+        color: '#4A9FFF',
+        fontSize: 12,
+        fontWeight: '600',
+        marginLeft: 4,
+    },
+    actionDivider: {
+        width: 1,
+        height: 14,
+        backgroundColor: '#2A2A4A',
+        marginHorizontal: 8,
+    },
+    statusPill: {
+        marginLeft: 'auto',
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+    },
+    statusPillText: {
+        fontSize: 10,
+        fontWeight: '700',
+        letterSpacing: 0.5,
+    },
     fab: { position: 'absolute', bottom: 30, right: 20, backgroundColor: '#E94560', width: 60, height: 60, borderRadius: 30, justifyContent: 'center', alignItems: 'center', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 5 },
     emptyContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 100 },
     emptyTitle: { color: 'white', fontSize: 20, fontWeight: 'bold', marginTop: 20 },

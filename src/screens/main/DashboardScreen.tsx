@@ -311,25 +311,6 @@ const DashboardScreen = () => {
                             </View>
                         </ScrollView>
 
-                        {/* Accesos Rápidos */}
-                        <View style={styles.quickAccessGrid}>
-                            <TouchableOpacity style={styles.quickAccessBtn} onPress={() => navigation.navigate('Servicios')}>
-                                <Ionicons name="cut" size={24} color="#E94560" />
-                                <Text style={styles.quickAccessLabel}>Servicios</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.quickAccessBtn} onPress={() => navigation.navigate('Horarios')}>
-                                <Ionicons name="calendar" size={24} color="#E94560" />
-                                <Text style={styles.quickAccessLabel}>Horarios</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.quickAccessBtn} onPress={() => navigation.navigate('Turnos')}>
-                                <Ionicons name="clipboard" size={24} color="#E94560" />
-                                <Text style={styles.quickAccessLabel}>Turnos</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.quickAccessBtn} onPress={() => { }}>
-                                <Ionicons name="settings-outline" size={24} color="#E94560" />
-                                <Text style={styles.quickAccessLabel}>Configuración</Text>
-                            </TouchableOpacity>
-                        </View>
                     </NativeAnimated.View>
                 )}
             </ScrollView>
@@ -411,9 +392,6 @@ const styles = StyleSheet.create({
     quickStatCard: { width: 160, height: 90, backgroundColor: '#1E1E3A', borderRadius: 16, padding: 16, marginRight: 15, justifyContent: 'center' },
     quickStatLabel: { color: '#A0A0B0', fontSize: 12, marginBottom: 4 },
     quickStatValue: { color: 'white', fontSize: 16, fontWeight: 'bold' },
-    quickAccessGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 15, justifyContent: 'space-between' },
-    quickAccessBtn: { width: (width - 45) / 2, height: 90, backgroundColor: '#1E1E3A', borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 15 },
-    quickAccessLabel: { color: 'white', fontSize: 14, marginTop: 8 },
     skeletonContainer: { paddingTop: 20 },
     onboardingBanner: { marginHorizontal: 20, marginBottom: 25, backgroundColor: 'rgba(245, 166, 35, 0.1)', borderWidth: 1, borderColor: '#F5A623', borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'center' },
     bannerIconBox: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(245, 166, 35, 0.15)', justifyContent: 'center', alignItems: 'center' },
