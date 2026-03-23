@@ -72,10 +72,12 @@ export interface Appointment {
     price_cents: number;
     notes: string | null;
     created_at: string;
-    // Relaciones
+    // Relaciones (pueden venir del join o cargarse por separado)
     users?: UserProfile;
     services?: Service;
     staff?: Staff;
+    // Alias que usa Supabase al hacer join con client_user_id
+    client?: UserProfile;
 }
 
 export interface BusinessUser {

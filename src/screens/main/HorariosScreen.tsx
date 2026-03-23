@@ -59,6 +59,9 @@ const HorariosScreen = () => {
     const [closeDayModal, setCloseDayModal] = useState(false);
     const [closeDayWeekday, setCloseDayWeekday] = useState<number | null>(null);
 
+    const [deleteBlackoutModal, setDeleteBlackoutModal] = useState(false);
+    const [deletingBlackoutId, setDeletingBlackoutId] = useState<string | null>(null);
+
     const fetchData = useCallback(async () => {
         if (!business) return;
         setLoading(true);
@@ -246,20 +249,22 @@ const HorariosScreen = () => {
     };
 
     const deleteBlackout = (id: string) => {
-        Alert.alert('¿Eliminar bloqueo?', 'Este día volverá a estar disponible según el horario semanal.', [
-            { text: 'Cancelar', style: 'cancel' },
-            {
-                text: 'Eliminar',
-                style: 'destructive',
-                onPress: async () => {
-                    const { error } = await supabase.from('blackout_dates').delete().eq('id', id);
-                    if (!error) {
-                        setBlackoutDates(prev => prev.filter(b => b.id !== id));
-                        toastRef.current?.show('Bloqueo eliminado', 'info');
-                    }
-                }
-            }
-        ]);
+        setDeletingBlackoutId(id);
+        setDeleteBlackoutModal(true);
+    };
+
+    const confirmDeleteBlackout = async () => {
+        if (!deletingBlackoutId) return;
+        const { error } = await supabase
+            .from('blackout_dates')
+            .delete()
+            .eq('id', deletingBlackoutId);
+        if (!error) {
+            setBlackoutDates(prev => prev.filter(b => b.id !== deletingBlackoutId));
+            toastRef.current?.show('Bloqueo eliminado', 'info');
+        }
+        setDeleteBlackoutModal(false);
+        setDeletingBlackoutId(null);
     };
 
     const logAction = async (action: string, metadata: any) => {
@@ -425,6 +430,40 @@ const HorariosScreen = () => {
                     )}
                 </View>
             </ScrollView>
+
+            {/* Modal Eliminar Bloqueo */}
+            <Modal visible={deleteBlackoutModal} transparent animationType="fade">
+                <View style={styles.modalOverlay}>
+                    <View style={styles.confirmModalContent}>
+                        <View style={styles.confirmModalIcon}>
+                            <Ionicons name="trash-outline" size={36} color="#E94560" />
+                        </View>
+                        <Text style={styles.confirmModalTitle}>
+                            ¿Eliminar bloqueo?
+                        </Text>
+                        <Text style={styles.confirmModalBody}>
+                            Este día volverá a estar disponible para reservas según el horario semanal configurado.
+                        </Text>
+                        <View style={styles.confirmModalBtns}>
+                            <TouchableOpacity
+                                style={styles.confirmCancelBtn}
+                                onPress={() => {
+                                    setDeleteBlackoutModal(false);
+                                    setDeletingBlackoutId(null);
+                                }}
+                            >
+                                <Text style={styles.confirmCancelText}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.confirmDestructiveBtn}
+                                onPress={confirmDeleteBlackout}
+                            >
+                                <Text style={styles.confirmDestructiveText}>Eliminar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
 
             {/* Modal Confirmar Cierre de Día */}
             <Modal visible={closeDayModal} transparent animationType="fade">

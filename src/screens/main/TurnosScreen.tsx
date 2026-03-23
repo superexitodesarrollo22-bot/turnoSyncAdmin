@@ -82,6 +82,7 @@ const TurnosScreen = ({ navigation }: any) => {
     const [staffList, setStaffList] = useState<Staff[]>([]);
     const [staffAssignModalVisible, setStaffAssignModalVisible] = useState(false);
     const [assigningLoading, setAssigningLoading] = useState(false);
+    const [clientsMap, setClientsMap] = useState<Record<string, any>>({});
 
     // Realtime Indicator animation
     const liveDotOpacity = useRef(new NativeAnimated.Value(0.4)).current;
@@ -102,11 +103,11 @@ const TurnosScreen = ({ navigation }: any) => {
             let query = supabase
                 .from('appointments')
                 .select(`
-          id, start_at, end_at, status, price_cents, notes, created_at,
-          users:client_user_id(id, full_name, email),
-          services(id, name, duration_minutes),
-          staff(id, name, specialty, photo_url)
-        `)
+                    id, start_at, end_at, status, price_cents, notes,
+                    created_at, client_user_id,
+                    services(id, name, duration_minutes),
+                    staff(id, name, specialty, photo_url)
+                `)
                 .eq('business_id', business.id)
                 .gte('start_at', `${dateStr}T00:00:00.000Z`)
                 .lte('start_at', `${dateStr}T23:59:59.999Z`);
@@ -120,6 +121,28 @@ const TurnosScreen = ({ navigation }: any) => {
             if (error) throw error;
             const apps = data as unknown as Appointment[] || [];
             setAppointments(apps);
+
+            // Cargar datos de clientes via RPC para evitar bloqueo de RLS
+            if (apps.length > 0) {
+                const newMap: Record<string, any> = {};
+                await Promise.all(
+                    apps.map(async (app) => {
+                        try {
+                            const { data: clientData } = await supabase
+                                .rpc('get_appointment_client', {
+                                    p_appointment_id: app.id
+                                });
+                            if (clientData && clientData.length > 0) {
+                                newMap[app.client_user_id] = clientData[0];
+                            }
+                        } catch (e) {
+                            console.log('Error cargando cliente:', e);
+                        }
+                    })
+                );
+                setClientsMap(newMap);
+            }
+
             scheduleFutureReminders(apps);
         } catch (error: any) {
             console.error('Error fetching appointments:', error.message);
@@ -143,22 +166,33 @@ const TurnosScreen = ({ navigation }: any) => {
             const { data, error } = await supabase
                 .from('appointments')
                 .select(`
-            id, start_at, end_at, status, price_cents, notes, created_at,
-            users:client_user_id(id, full_name, email),
-            services(id, name, duration_minutes),
-            staff(id, name, specialty, photo_url)
-        `)
+                    id, start_at, end_at, status, price_cents, notes,
+                    created_at, client_user_id,
+                    services(id, name, duration_minutes),
+                    staff(id, name, specialty, photo_url)
+                `)
                 .eq('id', id)
                 .eq('business_id', business!.id)
                 .single();
 
             if (error || !data) return;
 
-            // Si el turno es de otro día, cambiar la fecha seleccionada
+            // Cargar datos del cliente via RPC
+            try {
+                const { data: clientData } = await supabase
+                    .rpc('get_appointment_client', { p_appointment_id: id });
+                if (clientData && clientData.length > 0) {
+                    setClientsMap(prev => ({
+                        ...prev,
+                        [data.client_user_id]: clientData[0]
+                    }));
+                }
+            } catch (e) {
+                console.log('Error cargando cliente por id:', e);
+            }
+
             const fechaDelTurno = new Date(data.start_at);
             setSelectedDate(fechaDelTurno);
-
-            // Abrir el detalle directamente
             setSelectedAppointment(data as unknown as Appointment);
         } catch (err) {
             console.error('[Push] Error al buscar turno por id:', err);
@@ -329,7 +363,7 @@ const TurnosScreen = ({ navigation }: any) => {
     const handleCancelClick = (item: Appointment) => {
         Alert.alert(
             '¿Cancelar turno?',
-            `Se cancelará el turno de ${(item as any).users?.full_name || 'Cliente'} para las ${formatTime12h(item.start_at)}.\n\nEsta acción dejará el espacio libre para otros clientes.`,
+            `Se cancelará el turno de ${getClient(item)?.full_name || 'Cliente'} para las ${formatTime12h(item.start_at)}.\n\nEsta acción dejará el espacio libre para otros clientes.`,
             [
                 { text: 'No, mantener', style: 'cancel' },
                 {
@@ -341,70 +375,79 @@ const TurnosScreen = ({ navigation }: any) => {
         );
     };
 
+    const getClient = useCallback((item: Appointment) => {
+        return clientsMap[item.client_user_id] || null;
+    }, [clientsMap]);
+
     const renderAppointmentItem = ({ item, index }: { item: Appointment, index: number }) => {
         const isCancelled = item.status === 'cancelled';
-        const client = (item as any).users;
+        const client = getClient(item);
         const service = (item as any).services;
 
         return (
-            <FadeInView delay={index * 80} style={{ marginBottom: 8 }}>
-                <PremiumCard
-                    style={[styles.appointmentCard, isCancelled ? { opacity: 0.6 } : {}, { padding: 0 }]}
+            <FadeInView delay={index * 60}>
+                <TouchableOpacity
+                    activeOpacity={0.8}
                     onPress={() => setSelectedAppointment(item)}
+                    style={[
+                        styles.appointmentCard,
+                        isCancelled && { opacity: 0.55 }
+                    ]}
                 >
                     <View style={[styles.statusBand, { backgroundColor: STATUS_COLORS[item.status] }]} />
 
                     <View style={styles.cardContent}>
-                        <View style={styles.cardHeader}>
+                        {/* Fila principal: hora + cliente + badge */}
+                        <View style={styles.cardRow}>
                             <View style={styles.timeBlock}>
                                 <Text style={styles.timeText}>{formatTime12h(item.start_at)}</Text>
                                 <Text style={styles.durationText}>{service?.duration_minutes} min</Text>
                             </View>
 
                             <View style={styles.clientBlock}>
-                                <Text style={[styles.clientName, isCancelled && styles.strikethrough]}>
+                                <Text style={[styles.clientName, isCancelled && styles.strikethrough]} numberOfLines={1}>
                                     {client?.full_name || 'Invitado'}
                                 </Text>
-                                <Text style={styles.clientContact}>{client?.email || 'Sin email'}</Text>
+                                <Text style={styles.clientContact} numberOfLines={1}>
+                                    {client?.email || 'Sin email'}
+                                </Text>
                             </View>
 
-                            <View style={styles.statusBadgeBlock}>
-                                <StatusBadge status={item.status} size="sm" />
-                            </View>
+                            <StatusBadge status={item.status} size="sm" />
                         </View>
 
-                        <View style={styles.cardDetails}>
-                            <View style={styles.serviceInfo}>
-                                <Ionicons name="cut-outline" size={14} color="#A0A0B0" />
-                                <Text style={[styles.serviceNameText, isCancelled && styles.strikethrough]}>
-                                    {service?.name} • {formatCurrency(item.price_cents)}
-                                </Text>
-                            </View>
+                        {/* Fila secundaria: servicio + staff + cancelar */}
+                        <View style={styles.cardRow2}>
+                            <Ionicons name="cut-outline" size={12} color="#707080" />
+                            <Text style={[styles.serviceNameText, isCancelled && styles.strikethrough]} numberOfLines={1}>
+                                {service?.name} • {formatCurrency(item.price_cents)}
+                            </Text>
+                            <Ionicons name="person-outline" size={12} color="#707080" style={{ marginLeft: 8 }} />
+                            <Text style={styles.staffNameSmall} numberOfLines={1}>
+                                {item.staff?.name || 'Sin asignar'}
+                            </Text>
 
-                            <View style={styles.staffInfoSmall}>
-                                <Ionicons name="person-outline" size={12} color="#707080" />
-                                <Text style={styles.staffNameSmall}>
-                                    {item.staff?.name || 'Sin asignar'}
-                                </Text>
-                            </View>
-
-                            {item.status !== 'cancelled' && item.status !== 'completed' && (
+                            {(item.status === 'pending' || item.status === 'confirmed') && (
                                 <TouchableOpacity
                                     style={styles.cancelBtnSmall}
-                                    onPress={() => handleCancelClick(item)}
+                                    onPress={(e) => {
+                                        e.stopPropagation();
+                                        handleCancelClick(item);
+                                    }}
                                 >
                                     <Text style={styles.cancelBtnTextSmall}>Cancelar</Text>
                                 </TouchableOpacity>
                             )}
                         </View>
 
-                        {item.notes && (
+                        {/* Notas (solo si existen) */}
+                        {item.notes ? (
                             <View style={styles.notesBox}>
-                                <Text style={styles.notesText} numberOfLines={2}>"{item.notes}"</Text>
+                                <Text style={styles.notesText} numberOfLines={1}>"{item.notes}"</Text>
                             </View>
-                        )}
+                        ) : null}
                     </View>
-                </PremiumCard>
+                </TouchableOpacity>
             </FadeInView>
         );
     };
@@ -556,7 +599,7 @@ const TurnosScreen = ({ navigation }: any) => {
 
     const AppointmentDetailModal = () => {
         if (!selectedAppointment) return null;
-        const client = (selectedAppointment as any).users;
+        const client = selectedAppointment ? getClient(selectedAppointment) : null;
         const service = (selectedAppointment as any).services;
         const isPast = new Date(selectedAppointment.start_at) < new Date();
 
@@ -596,22 +639,22 @@ const TurnosScreen = ({ navigation }: any) => {
                             <View style={styles.sheetSection}>
                                 <Text style={styles.sheetSectionTitle}>Cliente</Text>
                                 <View style={styles.clientInfoCard}>
-                                    <View style={styles.clientAvatarMini}>
-                                        <Text style={styles.clientAvatarText}>
-                                            {client?.full_name?.charAt(0)?.toUpperCase() ?? '?'}
-                                        </Text>
-                                    </View>
-                                    <View style={{ flex: 1, marginLeft: 12 }}>
-                                        <Text style={styles.detailValue}>
-                                            {client?.full_name ?? 'Cliente sin nombre'}
-                                        </Text>
-                                        <Text style={styles.detailSubValue}>
-                                            {client?.email ?? 'Sin correo registrado'}
-                                        </Text>
-                                    </View>
-                                    <TouchableOpacity style={styles.copyBtn}>
-                                        <Ionicons name="copy-outline" size={18} color="#4A9FFF" />
-                                    </TouchableOpacity>
+                            <View style={styles.clientAvatarMini}>
+                                <Text style={styles.clientAvatarText}>
+                                    {client?.full_name?.charAt(0)?.toUpperCase() ?? '?'}
+                                </Text>
+                            </View>
+                            <View style={{ flex: 1, marginLeft: 12 }}>
+                                <Text style={styles.detailValue}>
+                                    {client?.full_name ?? 'Cargando...'}
+                                </Text>
+                                <Text style={styles.detailSubValue}>
+                                    {client?.email ?? ''}
+                                </Text>
+                            </View>
+                            <TouchableOpacity style={styles.copyBtn}>
+                                <Ionicons name="copy-outline" size={18} color="#4A9FFF" />
+                            </TouchableOpacity>
                                 </View>
                             </View>
 
@@ -839,28 +882,22 @@ const styles = StyleSheet.create({
     funnelBtn: { padding: 4 },
     filterBadge: { position: 'absolute', top: 0, right: 0, width: 8, height: 8, borderRadius: 4, backgroundColor: '#4A9FFF', borderWidth: 1, borderColor: '#1A1A2E' },
     content: { flex: 1 },
-    listContent: { paddingHorizontal: 20, paddingBottom: 100 },
-    appointmentCard: { flexDirection: 'row', backgroundColor: '#1E1E3A', borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: '#2A2A4A', marginBottom: 8 },
-    statusBand: { width: 6, height: '100%' },
-    cardContent: { flex: 1, padding: 12 },
-    cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-    timeBlock: { width: 65 },
-    timeText: { color: 'white', fontSize: 14, fontWeight: 'bold' },
-    durationText: { color: '#707080', fontSize: 11, marginTop: 2 },
-    clientBlock: { flex: 1, paddingHorizontal: 8 },
-    clientName: { color: 'white', fontSize: 16, fontWeight: 'bold' },
-    clientContact: { color: '#A0A0B0', fontSize: 12, marginTop: 2 },
-    statusBadgeBlock: { alignItems: 'flex-end' },
-    statusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
-    statusBadgeText: { fontSize: 9, fontWeight: 'bold' },
-    cardDetails: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 5 },
-    serviceInfo: { flexDirection: 'row', alignItems: 'center', flex: 1 },
-    serviceNameText: { color: '#A0A0B0', fontSize: 13, marginLeft: 6 },
-    cancelBtnSmall: { paddingVertical: 4, paddingHorizontal: 10, borderRadius: 6, borderWidth: 1, borderColor: '#E94560' },
-    cancelBtnTextSmall: { color: '#E94560', fontSize: 11, fontWeight: 'bold' },
-    strikethrough: { textDecorationLine: 'line-through', opacity: 0.6 },
-    notesBox: { marginTop: 10, padding: 8, backgroundColor: '#2A2A4A', borderRadius: 8, borderLeftWidth: 2, borderLeftColor: '#4A9FFF' },
-    notesText: { color: '#A0A0B0', fontSize: 12, fontStyle: 'italic' },
+    listContent: { paddingHorizontal: 14, paddingTop: 6, paddingBottom: 100, gap: 6 },
+    appointmentCard: { flexDirection: 'row', backgroundColor: '#1E1E3A', borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#2A2A4A' },
+    statusBand: { width: 5 },
+    cardContent: { flex: 1, paddingHorizontal: 10, paddingVertical: 8 },
+    timeBlock: { width: 62, marginRight: 8 },
+    timeText: { color: 'white', fontSize: 13, fontWeight: 'bold' },
+    durationText: { color: '#707080', fontSize: 11 },
+    clientBlock: { flex: 1, paddingRight: 6 },
+    clientName: { color: 'white', fontSize: 14, fontWeight: '700' },
+    clientContact: { color: '#A0A0B0', fontSize: 11 },
+    serviceNameText: { color: '#A0A0B0', fontSize: 11, marginLeft: 4, flex: 1 },
+    cancelBtnSmall: { paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6, borderWidth: 1, borderColor: '#E94560', marginLeft: 6 },
+    cancelBtnTextSmall: { color: '#E94560', fontSize: 10, fontWeight: 'bold' },
+    strikethrough: { textDecorationLine: 'line-through', opacity: 0.5 },
+    notesBox: { marginTop: 5, paddingVertical: 4, paddingHorizontal: 8, backgroundColor: '#2A2A4A', borderRadius: 6, borderLeftWidth: 2, borderLeftColor: '#4A9FFF' },
+    notesText: { color: '#A0A0B0', fontSize: 11, fontStyle: 'italic' },
     emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 100 },
     emptyTitle: { color: '#404060', fontSize: 18, marginTop: 15, fontWeight: 'bold' },
     weekContainer: { flex: 1, paddingBottom: 80 },
@@ -901,7 +938,9 @@ const styles = StyleSheet.create({
     actionBtn: { height: 54, borderRadius: 12, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
     actionBtnText: { color: 'white', fontSize: 16, fontWeight: 'bold', marginLeft: 10 },
     staffInfoSmall: { flexDirection: 'row', alignItems: 'center', marginLeft: 15 },
-    staffNameSmall: { color: '#707080', fontSize: 12, marginLeft: 4 },
+    staffNameSmall: { color: '#707080', fontSize: 11, marginLeft: 3, maxWidth: 80 },
+    cardRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
+    cardRow2: { flexDirection: 'row', alignItems: 'center', flexWrap: 'nowrap' },
     staffAssignCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#16213E', padding: 16, borderRadius: 16 },
     staffAvatarMini: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
     changeBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: 'rgba(74, 159, 255, 0.1)' },
