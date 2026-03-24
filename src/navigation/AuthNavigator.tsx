@@ -17,8 +17,8 @@ const AuthNavigator = () => {
     // Mientras se lee AsyncStorage no renderizar nada
     if (loading) {
         return (
-            <View style={{ flex: 1, backgroundColor: '#1A1A2E', justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator color="#6C63FF" />
+            <View style={{ flex: 1, backgroundColor: '#FFFFFF', justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator color="#E94560" />
             </View>
         );
     }
@@ -33,11 +33,11 @@ const AuthNavigator = () => {
             initialRouteName="Login"
             screenOptions={{
                 headerShown: false,
-                cardStyle: { backgroundColor: '#1A1A2E' },
+                cardStyle: { backgroundColor: '#FFFFFF' },
                 headerStyle: {
-                    backgroundColor: '#1A1A2E',
+                    backgroundColor: '#FFFFFF',
                 },
-                headerTintColor: '#FFFFFF',
+                headerTintColor: '#1A1A1A',
                 headerTitleStyle: {
                     fontWeight: 'bold',
                 },

@@ -23,8 +23,8 @@ const TABS: { key: TabKey; label: string }[] = [
 ];
 
 const STATUS_COLORS: Record<TabKey, { bg: string; text: string }> = {
-    pending: { bg: '#F5A623', text: '#1A1A2E' },
-    approved: { bg: '#2ECC71', text: '#1A1A2E' },
+    pending: { bg: '#F5A623', text: '#FFFFFF' },
+    approved: { bg: '#2ECC71', text: '#FFFFFF' },
     rejected: { bg: '#E94560', text: '#FFFFFF' },
 };
 
@@ -142,12 +142,12 @@ export default function SolicitudesScreen({ navigation }: any) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" />
+            <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-                    <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+                    <Ionicons name="arrow-back" size={22} color="#1A1A1A" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Solicitudes de suscripción</Text>
                 <View style={{ width: 36 }} />
@@ -192,7 +192,7 @@ export default function SolicitudesScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: '#1A1A2E' },
+    safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
     // Header
     header: {
         flexDirection: 'row',
@@ -201,7 +201,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 14,
         borderBottomWidth: 1,
-        borderBottomColor: '#1E1E3A',
+        borderBottomColor: '#DEDEDB',
+        backgroundColor: '#FFFFFF',
     },
     backBtn: {
         padding: 4,
@@ -210,16 +211,18 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         flex: 1,
         textAlign: 'center',
     },
     // Tabs
     tabBar: {
         flexDirection: 'row',
-        backgroundColor: '#12122A',
+        backgroundColor: '#FFFFFF',
         paddingHorizontal: 16,
         paddingTop: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: '#DEDEDB',
     },
     tab: {
         flex: 1,
@@ -230,7 +233,7 @@ const styles = StyleSheet.create({
     tabActive: {},
     tabText: {
         fontSize: 13,
-        color: '#8888A0',
+        color: '#5A5A5A',
         fontWeight: '600',
     },
     tabTextActive: {
@@ -257,15 +260,21 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
         gap: 16,
         flexGrow: 1,
+        backgroundColor: '#F5F5F0',
     },
     // Card
     card: {
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 16,
         gap: 12,
         borderWidth: 1,
-        borderColor: '#2A2A48',
+        borderColor: '#DEDEDB',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
     },
     cardHeader: {
         flexDirection: 'row',
@@ -284,7 +293,7 @@ const styles = StyleSheet.create({
     },
     cardDate: {
         fontSize: 12,
-        color: '#8888A0',
+        color: '#9A9A9A',
     },
     cardRow: {
         flexDirection: 'row',
@@ -297,26 +306,26 @@ const styles = StyleSheet.create({
     cardCompany: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
     },
     cardCompanyType: {
         fontSize: 12,
-        color: '#8888A0',
+        color: '#5A5A5A',
         marginTop: 2,
     },
     cardAdminName: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#D0D0E0',
+        color: '#1A1A1A',
     },
     cardAdminEmail: {
         fontSize: 12,
-        color: '#8888A0',
+        color: '#5A5A5A',
         marginTop: 1,
     },
     cardAdminPhone: {
         fontSize: 12,
-        color: '#8888A0',
+        color: '#5A5A5A',
         marginTop: 1,
     },
     detailBtn: {
@@ -344,11 +353,11 @@ const styles = StyleSheet.create({
     emptyTitle: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
     },
     emptySubtitle: {
         fontSize: 14,
-        color: '#8888A0',
+        color: '#5A5A5A',
         textAlign: 'center',
     },
 });

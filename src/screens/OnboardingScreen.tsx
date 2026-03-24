@@ -28,19 +28,19 @@ interface SlideData {
 const SLIDES: SlideData[] = [
     {
         icon: 'people-outline',
-        iconColor: '#6C63FF',
+        iconColor: '#E94560',
         title: 'Gestiona tu equipo',
         description:
             'Controla los turnos de todo tu staff desde un solo lugar con total visibilidad',
-        gradientColors: ['#6C63FF22', '#1A1A2E'],
+        gradientColors: ['#FFFFFF', '#F5F5F0'],
     },
     {
         icon: 'calendar-outline',
-        iconColor: '#00D9A6',
+        iconColor: '#2ECC71',
         title: 'Agenda inteligente',
         description:
             'Visualiza y administra citas en tiempo real. Confirmaciones automáticas para tus clientes',
-        gradientColors: ['#00D9A622', '#1A1A2E'],
+        gradientColors: ['#FFFFFF', '#F5F5F0'],
     },
     {
         icon: 'stats-chart-outline',
@@ -48,7 +48,7 @@ const SLIDES: SlideData[] = [
         title: 'Reportes y métricas',
         description:
             'Analiza el rendimiento de tu negocio con estadísticas claras y exportables',
-        gradientColors: ['#FFB54722', '#1A1A2E'],
+        gradientColors: ['#FFFFFF', '#F5F5F0'],
     },
 ];
 
@@ -170,7 +170,7 @@ export default function OnboardingScreen({ onDone }: Props) {
                     activeOpacity={0.85}
                 >
                     <LinearGradient
-                        colors={['#6C63FF', '#5A53E8']}
+                        colors={['#E94560', '#C62C46']}
                         style={styles.primaryBtnGradient}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
@@ -195,7 +195,7 @@ export default function OnboardingScreen({ onDone }: Props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#FFFFFF',
     },
 
     // Saltar
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
         paddingVertical: 14,
     },
     skipText: {
-        color: '#A0A0C0',
+        color: '#5A5A5A',
         fontSize: 14,
         fontWeight: '500',
     },
@@ -235,23 +235,23 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         textAlign: 'center',
         marginBottom: 16,
         letterSpacing: 0.3,
     },
     description: {
         fontSize: 16,
-        color: '#A0A0C0',
+        color: '#5A5A5A',
         textAlign: 'center',
         lineHeight: 24,
     },
 
     // Footer
     footer: {
-        paddingBottom: 16,
+        paddingBottom: 20,
         paddingHorizontal: 24,
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#F5F5F0',
     },
     dots: {
         flexDirection: 'row',
@@ -266,11 +266,11 @@ const styles = StyleSheet.create({
     },
     dotActive: {
         width: 24,
-        backgroundColor: '#6C63FF',
+        backgroundColor: '#E94560',
     },
     dotInactive: {
         width: 8,
-        backgroundColor: '#2E2E50',
+        backgroundColor: '#DEDEDB',
     },
 
     // Botón principal

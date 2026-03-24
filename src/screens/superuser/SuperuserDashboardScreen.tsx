@@ -91,7 +91,7 @@ export default function SuperuserDashboardScreen({ navigation }: any) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" />
+            <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
             <ScrollView
                 style={styles.container}
                 contentContainerStyle={{ paddingBottom: 80 }}
@@ -246,11 +246,11 @@ function KPICard({
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#FFFFFF',
     },
     container: {
         flex: 1,
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#F5F5F0',
         paddingHorizontal: 16,
     },
     // Header
@@ -267,18 +267,18 @@ const styles = StyleSheet.create({
     logoText: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         letterSpacing: 0.5,
     },
     superBadge: {
         marginTop: 3,
-        backgroundColor: 'rgba(233,69,96,0.2)',
+        backgroundColor: 'rgba(233,69,96,0.1)',
         borderRadius: 6,
         paddingHorizontal: 8,
         paddingVertical: 2,
         alignSelf: 'flex-start',
         borderWidth: 1,
-        borderColor: 'rgba(233,69,96,0.5)',
+        borderColor: 'rgba(233,69,96,0.3)',
     },
     superBadgeText: {
         fontSize: 9,
@@ -294,13 +294,15 @@ const styles = StyleSheet.create({
     },
     headerName: {
         fontSize: 14,
-        color: '#C0C0D0',
+        color: '#1A1A1A',
         fontWeight: '500',
     },
     signOutBtn: {
         padding: 6,
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#DEDEDB',
     },
     // Greeting
     greetingSection: {
@@ -310,11 +312,11 @@ const styles = StyleSheet.create({
     greetingText: {
         fontSize: 24,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
     },
     greetingSubtext: {
         fontSize: 14,
-        color: '#8888A0',
+        color: '#5A5A5A',
         marginTop: 4,
     },
     // Loading
@@ -332,10 +334,17 @@ const styles = StyleSheet.create({
     },
     kpiCard: {
         width: '47.5%',
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 16,
         borderTopWidth: 3,
+        borderWidth: 1,
+        borderColor: '#DEDEDB',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
     },
     kpiIcon: {
         marginBottom: 10,
@@ -347,21 +356,21 @@ const styles = StyleSheet.create({
     kpiTitle: {
         fontSize: 10,
         fontWeight: '700',
-        color: '#8888A0',
+        color: '#5A5A5A',
         marginTop: 4,
         letterSpacing: 0.8,
         textTransform: 'uppercase',
     },
     kpiSubtitle: {
         fontSize: 12,
-        color: '#60607A',
+        color: '#9A9A9A',
         marginTop: 2,
     },
     // Quick access
     sectionTitle: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         marginBottom: 12,
     },
     quickAccessWrapper: {
@@ -387,7 +396,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     quickAccessCard: {
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 20,
         flexDirection: 'row',
@@ -396,6 +405,13 @@ const styles = StyleSheet.create({
         borderLeftWidth: 4,
         borderLeftColor: '#E94560',
         marginBottom: 12,
+        borderWidth: 1,
+        borderColor: '#DEDEDB',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
     },
     quickAccessLeft: {
         flexDirection: 'row',
@@ -416,11 +432,11 @@ const styles = StyleSheet.create({
     quickTitle: {
         fontSize: 15,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
     },
     quickSubtitle: {
         fontSize: 12,
-        color: '#8888A0',
+        color: '#5A5A5A',
         marginTop: 3,
     },
 });

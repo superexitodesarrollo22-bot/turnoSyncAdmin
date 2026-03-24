@@ -21,8 +21,8 @@ import { SubscriptionRequest } from '../../types';
 type Status = 'pending' | 'approved' | 'rejected';
 
 const STATUS_COLORS: Record<Status, { bg: string; text: string }> = {
-    pending: { bg: '#F5A623', text: '#1A1A2E' },
-    approved: { bg: '#2ECC71', text: '#1A1A2E' },
+    pending: { bg: '#F5A623', text: '#FFFFFF' },
+    approved: { bg: '#2ECC71', text: '#FFFFFF' },
     rejected: { bg: '#E94560', text: '#FFFFFF' },
 };
 const STATUS_LABELS: Record<Status, string> = {
@@ -132,12 +132,12 @@ export default function DetalleSolicitudScreen({ navigation, route }: any) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" />
+            <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-                    <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+                    <Ionicons name="arrow-back" size={22} color="#1A1A1A" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Detalle de solicitud</Text>
                 <View style={[styles.statusPill, { backgroundColor: statusColor.bg }]}>
@@ -201,10 +201,10 @@ export default function DetalleSolicitudScreen({ navigation, route }: any) {
                             activeOpacity={0.8}
                         >
                             {loadingApprove ? (
-                                <ActivityIndicator color="#1A1A2E" />
+                                <ActivityIndicator color="#FFFFFF" />
                             ) : (
                                 <>
-                                    <Ionicons name="checkmark-circle" size={20} color="#1A1A2E" />
+                                    <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
                                     <Text style={styles.approveBtnText}>Aprobar solicitud</Text>
                                 </>
                             )}
@@ -367,7 +367,7 @@ function InfoRowCopy({ label, value, onCopy }: { label: string; value?: string |
 }
 
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: '#1A1A2E' },
+    safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -375,13 +375,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 14,
         borderBottomWidth: 1,
-        borderBottomColor: '#1E1E3A',
+        borderBottomColor: '#DEDEDB',
+        backgroundColor: '#FFFFFF',
     },
     backBtn: { padding: 4, width: 36 },
     headerTitle: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         flex: 1,
         textAlign: 'center',
     },
@@ -395,20 +396,25 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         letterSpacing: 0.8,
     },
-    scroll: { flex: 1 },
+    scroll: { flex: 1, backgroundColor: '#F5F5F0' },
     scrollContent: { padding: 16, gap: 16 },
     // Section card
     sectionCard: {
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#2A2A48',
+        borderColor: '#DEDEDB',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
     },
     sectionCardTitle: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#A0A0C0',
+        color: '#5A5A5A',
         marginBottom: 12,
         textTransform: 'uppercase',
         letterSpacing: 0.8,
@@ -421,16 +427,16 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         paddingVertical: 4,
         borderBottomWidth: 1,
-        borderBottomColor: '#2A2A48',
+        borderBottomColor: '#F5F5F0',
     },
     infoLabel: {
         fontSize: 12,
-        color: '#8888A0',
+        color: '#5A5A5A',
         flex: 1,
     },
     infoValue: {
         fontSize: 13,
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         flex: 2,
         textAlign: 'right',
     },
@@ -451,13 +457,13 @@ const styles = StyleSheet.create({
     },
     dateText: {
         fontSize: 13,
-        color: '#8888A0',
+        color: '#5A5A5A',
         flex: 1,
     },
     // Notes
     notesText: {
         fontSize: 14,
-        color: '#C0C0D0',
+        color: '#1A1A1A',
         lineHeight: 20,
     },
     // Actions
@@ -477,7 +483,7 @@ const styles = StyleSheet.create({
     approveBtnText: {
         fontSize: 16,
         fontWeight: '800',
-        color: '#1A1A2E',
+        color: '#FFFFFF',
     },
     rejectBtn: {
         backgroundColor: 'transparent',
@@ -498,36 +504,41 @@ const styles = StyleSheet.create({
     // Modal
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.75)',
+        backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'flex-end',
     },
     modalBox: {
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         padding: 24,
         gap: 14,
         borderTopWidth: 1,
-        borderColor: '#2A2A48',
+        borderColor: '#DEDEDB',
+        elevation: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
     },
     modalTitle: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
     },
     modalSubtitle: {
         fontSize: 14,
-        color: '#A0A0C0',
+        color: '#5A5A5A',
         lineHeight: 20,
     },
     motivoInput: {
-        backgroundColor: '#12122A',
+        backgroundColor: '#F5F5F0',
         borderRadius: 12,
         padding: 14,
         fontSize: 14,
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         borderWidth: 1,
-        borderColor: '#2A2A48',
+        borderColor: '#DEDEDB',
         minHeight: 100,
     },
     modalActions: {
@@ -540,11 +551,11 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#2A2A48',
+        borderColor: '#DEDEDB',
     },
     modalCancelText: {
         fontSize: 14,
-        color: '#A0A0C0',
+        color: '#5A5A5A',
         fontWeight: '600',
     },
     modalRejectBtn: {
@@ -581,11 +592,11 @@ const styles = StyleSheet.create({
     stepTitle: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
     },
     stepNote: {
         fontSize: 12,
-        color: '#8888A0',
+        color: '#5A5A5A',
         marginTop: 2,
     },
     copyEmailBtn: {
@@ -593,7 +604,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 6,
         marginTop: 4,
-        backgroundColor: 'rgba(74,159,255,0.1)',
+        backgroundColor: 'rgba(74,159,255,0.05)',
         borderRadius: 6,
         paddingHorizontal: 8,
         paddingVertical: 4,
@@ -609,7 +620,7 @@ const styles = StyleSheet.create({
         borderRadius: 14,
         paddingVertical: 15,
         alignItems: 'center',
-        marginTop: 4,
+        marginTop: 10,
     },
     doneBtnText: {
         fontSize: 15,

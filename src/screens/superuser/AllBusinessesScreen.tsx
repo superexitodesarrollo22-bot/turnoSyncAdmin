@@ -200,12 +200,12 @@ export default function AllBusinessesScreen({ navigation }: any) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" />
+            <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-                    <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+                    <Ionicons name="arrow-back" size={22} color="#1A1A1A" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Negocios registrados</Text>
                 <View style={{ width: 36 }} />
@@ -278,7 +278,7 @@ function CounterChip({
 }
 
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: '#1A1A2E' },
+    safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -286,13 +286,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 14,
         borderBottomWidth: 1,
-        borderBottomColor: '#1E1E3A',
+        borderBottomColor: '#DEDEDB',
+        backgroundColor: '#FFFFFF',
     },
     backBtn: { padding: 4, width: 36 },
     headerTitle: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         flex: 1,
         textAlign: 'center',
     },
@@ -300,25 +301,25 @@ const styles = StyleSheet.create({
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         borderRadius: 14,
         marginHorizontal: 16,
         marginTop: 14,
         paddingHorizontal: 14,
         borderWidth: 1,
-        borderColor: '#2A2A48',
+        borderColor: '#DEDEDB',
     },
     searchIcon: { marginRight: 8 },
     searchInput: {
         flex: 1,
         paddingVertical: 12,
         fontSize: 14,
-        color: '#FFFFFF',
+        color: '#1A1A1A',
     },
     clearBtn: { padding: 4 },
     countText: {
         fontSize: 12,
-        color: '#8888A0',
+        color: '#5A5A5A',
         marginHorizontal: 20,
         marginTop: 10,
         marginBottom: 2,
@@ -334,15 +335,21 @@ const styles = StyleSheet.create({
         padding: 16,
         gap: 14,
         flexGrow: 1,
+        backgroundColor: '#F5F5F0',
     },
     // Card
     card: {
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 16,
         gap: 8,
         borderWidth: 1,
-        borderColor: '#2A2A48',
+        borderColor: '#DEDEDB',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
     },
     cardHeader: {
         flexDirection: 'row',
@@ -352,7 +359,7 @@ const styles = StyleSheet.create({
     cardName: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         flex: 1,
         marginRight: 10,
     },
@@ -376,11 +383,11 @@ const styles = StyleSheet.create({
     },
     cardAddress: {
         fontSize: 12,
-        color: '#8888A0',
+        color: '#5A5A5A',
     },
     cardDate: {
         fontSize: 12,
-        color: '#60607A',
+        color: '#9A9A9A',
     },
     countersRow: {
         flexDirection: 'row',
@@ -391,14 +398,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        backgroundColor: '#12122A',
+        backgroundColor: '#F5F5F0',
         borderRadius: 8,
         paddingHorizontal: 8,
         paddingVertical: 5,
+        borderWidth: 1,
+        borderColor: '#DEDEDB',
     },
     chipText: {
         fontSize: 11,
-        color: '#A0A0C0',
+        color: '#5A5A5A',
         fontWeight: '600',
     },
     // Empty state
@@ -412,11 +421,11 @@ const styles = StyleSheet.create({
     emptyTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
     },
     emptySubtitle: {
         fontSize: 14,
-        color: '#8888A0',
+        color: '#5A5A5A',
         textAlign: 'center',
     },
 });

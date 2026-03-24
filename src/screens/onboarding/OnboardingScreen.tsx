@@ -226,7 +226,7 @@ const OnboardingScreen = ({ onComplete }: { onComplete: () => void }) => {
                 <Text style={styles.title}>¡Bienvenido a TurnoSync Admin!</Text>
                 <Text style={styles.subtitle}>Hola, {userProfile?.full_name || 'Admin'}</Text>
                 <Text style={styles.heroText}>
-                    Tu cuenta ha sido activada para <Text style={{ color: 'white', fontWeight: 'bold' }}>{business?.name}</Text>.
+                    Tu cuenta ha sido activada para <Text style={{ color: '#1A1A1A', fontWeight: 'bold' }}>{business?.name}</Text>.
                     Vamos a configurar tu negocio en 3 pasos rápidos para que puedas empezar a recibir turnos hoy mismo.
                 </Text>
             </View>
@@ -452,7 +452,7 @@ const OnboardingScreen = ({ onComplete }: { onComplete: () => void }) => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#1A1A2E', '#16213E']} style={styles.container}>
+            <LinearGradient colors={['#FFFFFF', '#F5F5F0']} style={styles.container}>
                 <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
                     <View style={styles.safeArea}>
                         {step === 0 && renderWelcome()}
@@ -474,62 +474,62 @@ const styles = StyleSheet.create({
     safeArea: { flex: 1, padding: 30, paddingTop: 60 },
     stepContent: { flex: 1, justifyContent: 'center' },
     indicators: { flexDirection: 'row', justifyContent: 'center', marginBottom: 30 },
-    dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#2A2A4A', marginHorizontal: 4 },
+    dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#DEDEDB', marginHorizontal: 4 },
     dotActive: { backgroundColor: '#E94560' },
     welcomeHero: { alignItems: 'center', marginBottom: 40 },
-    title: { color: 'white', fontSize: 28, fontWeight: 'bold', textAlign: 'center', marginTop: 20 },
+    title: { color: '#1A1A1A', fontSize: 28, fontWeight: 'bold', textAlign: 'center', marginTop: 20 },
     subtitle: { color: '#E94560', fontSize: 18, fontWeight: '600', marginTop: 10 },
-    heroText: { color: '#A0A0B0', fontSize: 16, textAlign: 'center', marginTop: 20, lineHeight: 24 },
+    heroText: { color: '#5A5A5A', fontSize: 16, textAlign: 'center', marginTop: 20, lineHeight: 24 },
     mainBtn: { height: 56, borderRadius: 15, overflow: 'hidden' },
     btnGradient: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     mainBtnText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
-    stepTitle: { color: 'white', fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
-    stepSubtitle: { color: '#A0A0B0', fontSize: 15, marginBottom: 30 },
+    stepTitle: { color: '#1A1A1A', fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
+    stepSubtitle: { color: '#5A5A5A', fontSize: 15, marginBottom: 30 },
     formScroll: { flex: 1 },
     inputGroup: { marginBottom: 20 },
-    label: { color: 'white', fontSize: 14, fontWeight: '600', marginBottom: 10 },
-    input: { backgroundColor: '#1E1E3A', height: 50, borderRadius: 12, paddingHorizontal: 15, color: 'white', fontSize: 16, borderWidth: 1, borderColor: '#2A2A4A' },
+    label: { color: '#1A1A1A', fontSize: 14, fontWeight: '600', marginBottom: 10 },
+    input: { backgroundColor: '#FFFFFF', height: 50, borderRadius: 12, paddingHorizontal: 15, color: '#1A1A1A', fontSize: 16, borderWidth: 1, borderColor: '#DEDEDB' },
     footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 20 },
     skipBtn: { padding: 10 },
-    skipText: { color: '#707080', fontSize: 14, textDecorationLine: 'underline' },
+    skipText: { color: '#9A9A9A', fontSize: 14, textDecorationLine: 'underline' },
     nextBtn: { height: 50, borderRadius: 12, overflow: 'hidden', paddingHorizontal: 20 },
     nextBtnGradient: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
     nextBtnText: { color: 'white', fontSize: 15, fontWeight: 'bold' },
-    miniForm: { backgroundColor: '#1E1E3A', padding: 20, borderRadius: 16, marginBottom: 20, borderWidth: 1, borderColor: '#2A2A4A' },
-    miniInput: { backgroundColor: '#2A2A4A', height: 45, borderRadius: 10, paddingHorizontal: 15, color: 'white', marginBottom: 15 },
+    miniForm: { backgroundColor: '#FFFFFF', padding: 20, borderRadius: 16, marginBottom: 20, borderWidth: 1, borderColor: '#DEDEDB' },
+    miniInput: { backgroundColor: '#F5F5F0', height: 45, borderRadius: 10, paddingHorizontal: 15, color: '#1A1A1A', marginBottom: 15, borderWidth: 1, borderColor: '#DEDEDB' },
     durationRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
-    durBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: '#2A2A4A', marginRight: 6 },
+    durBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: '#EDEDEA', marginRight: 6 },
     durBtnActive: { backgroundColor: '#E94560' },
-    durBtnText: { color: '#A0A0B0', fontSize: 12 },
+    durBtnText: { color: '#5A5A5A', fontSize: 12 },
     durBtnTextActive: { color: 'white', fontWeight: 'bold' },
     priceMiniRow: { flexDirection: 'row', alignItems: 'center' },
-    currency: { color: '#A0A0B0', fontSize: 18, marginRight: 8 },
-    miniInputPrice: { flex: 1, backgroundColor: '#2A2A4A', height: 45, borderRadius: 10, paddingHorizontal: 15, color: 'white' },
+    currency: { color: '#5A5A5A', fontSize: 18, marginRight: 8 },
+    miniInputPrice: { flex: 1, backgroundColor: '#F5F5F0', height: 45, borderRadius: 10, paddingHorizontal: 15, color: '#1A1A1A', borderWidth: 1, borderColor: '#DEDEDB' },
     addServiceBtn: { backgroundColor: '#E94560', width: 45, height: 45, borderRadius: 10, marginLeft: 10, justifyContent: 'center', alignItems: 'center' },
-    listLabel: { color: '#A0A0B0', fontSize: 13, marginBottom: 10 },
+    listLabel: { color: '#5A5A5A', fontSize: 13, marginBottom: 10 },
     servicesListScroll: { maxHeight: 150 },
-    serviceChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1E1E3A', padding: 12, borderRadius: 10, marginBottom: 8, borderWidth: 1, borderColor: '#2A2A4A' },
-    serviceChipText: { flex: 1, color: 'white', fontSize: 13, marginHorizontal: 10 },
-    emptyText: { color: '#404060', fontStyle: 'italic', fontSize: 14 },
+    serviceChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', padding: 12, borderRadius: 10, marginBottom: 8, borderWidth: 1, borderColor: '#DEDEDB' },
+    serviceChipText: { flex: 1, color: '#1A1A1A', fontSize: 13, marginHorizontal: 10 },
+    emptyText: { color: '#9A9A9A', fontStyle: 'italic', fontSize: 14 },
     scheduleOptions: { marginBottom: 30 },
-    schedOpt: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1E1E3A', padding: 16, borderRadius: 12, marginBottom: 10, borderWidth: 1, borderColor: '#2A2A4A' },
+    schedOpt: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', padding: 16, borderRadius: 12, marginBottom: 10, borderWidth: 1, borderColor: '#DEDEDB' },
     schedOptActive: { borderColor: '#E94560', backgroundColor: 'rgba(233, 69, 96, 0.05)' },
-    schedOptText: { color: '#A0A0B0', fontSize: 14, marginLeft: 12 },
-    schedOptTextActive: { color: 'white', fontWeight: 'bold' },
-    labelInterval: { color: 'white', fontSize: 14, fontWeight: 'bold', marginBottom: 15 },
+    schedOptText: { color: '#5A5A5A', fontSize: 14, marginLeft: 12 },
+    schedOptTextActive: { color: '#1A1A1A', fontWeight: 'bold' },
+    labelInterval: { color: '#1A1A1A', fontSize: 14, fontWeight: 'bold', marginBottom: 15 },
     intervalGrid: { flexDirection: 'row', justifyContent: 'space-between' },
-    intBtn: { flex: 1, height: 45, backgroundColor: '#1E1E3A', borderRadius: 10, justifyContent: 'center', alignItems: 'center', marginHorizontal: 5, borderWidth: 1, borderColor: '#2A2A4A' },
+    intBtn: { flex: 1, height: 45, backgroundColor: '#FFFFFF', borderRadius: 10, justifyContent: 'center', alignItems: 'center', marginHorizontal: 5, borderWidth: 1, borderColor: '#DEDEDB' },
     intBtnActive: { backgroundColor: '#E94560', borderColor: '#E94560' },
-    intBtnText: { color: '#A0A0B0', fontSize: 13 },
+    intBtnText: { color: '#5A5A5A', fontSize: 13 },
     intBtnTextActive: { color: 'white', fontWeight: 'bold' },
     notifHero: { alignItems: 'center', paddingVertical: 40 },
     notifActions: { marginTop: 20 },
     successHero: { alignItems: 'center', marginBottom: 40 },
     checkCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#2ECC71', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
-    nameCard: { backgroundColor: '#1E1E3A', padding: 25, borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: '#2A2A4A' },
-    nameCardLabel: { color: '#A0A0B0', fontSize: 14, marginBottom: 15 },
-    nameCardVal: { color: 'white', fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-    copyBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(74, 159, 255, 0.1)', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 10 },
+    nameCard: { backgroundColor: '#FFFFFF', padding: 25, borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: '#DEDEDB' },
+    nameCardLabel: { color: '#5A5A5A', fontSize: 14, marginBottom: 15 },
+    nameCardVal: { color: '#1A1A1A', fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+    copyBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(74, 159, 255, 0.05)', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 10 },
     copyText: { color: '#4A9FFF', fontSize: 14, fontWeight: 'bold', marginLeft: 8 },
 });
 
