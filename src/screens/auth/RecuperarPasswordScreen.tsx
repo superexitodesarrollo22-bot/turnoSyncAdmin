@@ -83,9 +83,9 @@ const RecuperarPasswordScreen = () => {
     };
 
     return (
-        <LinearGradient colors={['#1A1A2E', '#16213E']} style={styles.container}>
+        <LinearGradient colors={['#FFFFFF', '#F5F5F0']} style={styles.container}>
             <TouchableOpacity style={styles.backButton} onPress={handleVolver}>
-                <Ionicons name="arrow-back" size={24} color="#A0A0B0" />
+                <Ionicons name="arrow-back" size={24} color="#5A5A5A" />
                 <Text style={styles.backButtonText}>Volver</Text>
             </TouchableOpacity>
 
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         paddingHorizontal: 24,
-        paddingTop: 80,
+        paddingTop: 120,
         paddingBottom: 40,
     },
     backButton: {
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
         padding: 8,
     },
     backButtonText: {
-        color: '#A0A0B0',
+        color: '#5A5A5A',
         fontSize: 16,
         marginLeft: 4,
     },
@@ -229,53 +229,65 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
         borderWidth: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 4,
     },
     title: {
         fontSize: 26,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         marginBottom: 10,
         textAlign: 'center',
     },
     description: {
         fontSize: 14,
-        color: '#A0A0B0',
+        color: '#5A5A5A',
         textAlign: 'center',
         maxWidth: 280,
         lineHeight: 20,
     },
     note: {
         fontSize: 12,
-        color: '#707080',
+        color: '#9A9A9A',
         textAlign: 'center',
         marginTop: 20,
         marginBottom: 40,
         fontStyle: 'italic',
     },
     card: {
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         borderRadius: 20,
         padding: 24,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 4,
+        borderWidth: 1,
+        borderColor: '#DEDEDB',
     },
     inputGroup: { marginBottom: 20 },
-    label: { color: '#FFFFFF', fontSize: 14, marginBottom: 8, fontWeight: '500' },
+    label: { color: '#1A1A1A', fontSize: 14, marginBottom: 8, fontWeight: '500' },
     inputWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#2A2A4A',
+        backgroundColor: '#EDEDEA',
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#3A3A5A',
+        borderColor: '#DEDEDB',
         height: 52,
         paddingHorizontal: 16,
     },
     inputIcon: { marginRight: 12 },
-    input: { flex: 1, color: '#FFFFFF', fontSize: 16 },
+    input: { flex: 1, color: '#1A1A1A', fontSize: 16 },
     errorContainer: { marginBottom: 16, padding: 12, backgroundColor: 'rgba(233, 69, 96, 0.1)', borderRadius: 8 },
     errorText: { color: '#E94560', fontSize: 13, textAlign: 'center' },
     button: { height: 52, borderRadius: 12, overflow: 'hidden' },
@@ -286,12 +298,12 @@ const styles = StyleSheet.create({
         height: 52,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#E94560',
+        borderColor: '#BCBCBC',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
     },
-    outlinedButtonText: { color: '#E94560', fontSize: 16, fontWeight: '600' },
+    outlinedButtonText: { color: '#5A5A5A', fontSize: 16, fontWeight: '600' },
     resendButton: { padding: 10 },
     resendText: { color: '#E94560', fontSize: 14, fontWeight: '500' },
 });

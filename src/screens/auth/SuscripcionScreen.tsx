@@ -257,7 +257,7 @@ const SuscripcionScreen = () => {
 
     if (submitted) {
         return (
-            <LinearGradient colors={['#1A1A2E', '#16213E']} style={styles.container}>
+            <LinearGradient colors={['#FFFFFF', '#F5F5F0']} style={styles.container}>
                 <View style={styles.successContainer}>
                     <View style={styles.successIconCircle}>
                         <Ionicons name="send" size={50} color="#E94560" />
@@ -290,11 +290,11 @@ const SuscripcionScreen = () => {
     }
 
     return (
-        <LinearGradient colors={['#1A1A2E', '#16213E']} style={styles.container}>
+        <LinearGradient colors={['#FFFFFF', '#F5F5F0']} style={styles.container}>
             <CustomPickerModal />
             <View style={styles.header}>
                 <TouchableOpacity style={styles.backButton} onPress={() => step === 2 ? animateStepChange(1) : navigation.goBack()}>
-                    <Ionicons name="arrow-back" size={24} color="white" />
+                    <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Solicitud de suscripción</Text>
             </View>
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     headerTitle: {
-        color: 'white',
+        color: '#1A1A1A',
         fontSize: 20,
         fontWeight: 'bold',
     },
@@ -540,12 +540,12 @@ const styles = StyleSheet.create({
         borderColor: '#E94560',
     },
     stepPending: {
-        backgroundColor: '#1A1A2E',
-        borderColor: '#3A3A5A',
+        backgroundColor: '#FFFFFF',
+        borderColor: '#DEDEDB',
     },
     stepNumber: {
         fontSize: 14,
-        color: '#A0A0B0',
+        color: '#9A9A9A',
         fontWeight: 'bold',
     },
     stepNumberActive: {
@@ -554,7 +554,7 @@ const styles = StyleSheet.create({
     progressLineContainer: {
         flex: 1,
         height: 2,
-        backgroundColor: '#3A3A5A',
+        backgroundColor: '#DEDEDB',
         marginHorizontal: -2,
     },
     progressLine: {
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     stepsText: {
-        color: '#A0A0B0',
+        color: '#5A5A5A',
         fontSize: 12,
         marginTop: 8,
     },
@@ -578,46 +578,48 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     stepTitle: {
-        color: 'white',
+        color: '#1A1A1A',
         fontSize: 24,
         fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: 8,
     },
     stepSubtitle: {
-        color: '#A0A0B0',
+        color: '#5A5A5A',
         fontSize: 14,
         textAlign: 'center',
         marginBottom: 24,
     },
     card: {
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         borderRadius: 20,
         padding: 24,
         elevation: 4,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
+        shadowOpacity: 0.1,
         shadowRadius: 10,
+        borderWidth: 1,
+        borderColor: '#DEDEDB',
     },
     inputGroup: {
         marginBottom: 20,
     },
     label: {
-        color: 'white',
+        color: '#1A1A1A',
         fontSize: 14,
         fontWeight: '600',
         marginBottom: 8,
     },
     input: {
-        backgroundColor: '#2A2A4A',
+        backgroundColor: '#EDEDEA',
         borderRadius: 12,
         paddingHorizontal: 16,
         height: 52,
-        color: 'white',
+        color: '#1A1A1A',
         fontSize: 16,
         borderWidth: 1,
-        borderColor: '#3A3A5A',
+        borderColor: '#DEDEDB',
     },
     textArea: {
         height: 100,
@@ -625,18 +627,18 @@ const styles = StyleSheet.create({
         textAlignVertical: 'top',
     },
     helperText: {
-        color: '#707080',
+        color: '#9A9A9A',
         fontSize: 12,
         marginTop: 4,
     },
     charCount: {
-        color: '#707080',
+        color: '#9A9A9A',
         fontSize: 12,
         textAlign: 'right',
         marginTop: 4,
     },
     selector: {
-        backgroundColor: '#2A2A4A',
+        backgroundColor: '#EDEDEA',
         borderRadius: 12,
         paddingHorizontal: 16,
         height: 52,
@@ -644,10 +646,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         borderWidth: 1,
-        borderColor: '#3A3A5A',
+        borderColor: '#DEDEDB',
     },
     selectorText: {
-        color: 'white',
+        color: '#1A1A1A',
         fontSize: 16,
     },
     termsRow: {
@@ -669,7 +671,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#E94560',
     },
     termsText: {
-        color: '#A0A0B0',
+        color: '#5A5A5A',
         fontSize: 13,
         flex: 1,
     },
@@ -715,27 +717,27 @@ const styles = StyleSheet.create({
         marginRight: 12,
     },
     secondaryButtonText: {
-        color: '#A0A0B0',
+        color: '#5A5A5A',
         fontSize: 16,
     },
     // Modal Styles
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.7)',
+        backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 24,
     },
     modalContent: {
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         width: '100%',
         borderRadius: 20,
         padding: 24,
         borderWidth: 1,
-        borderColor: '#3A3A5A',
+        borderColor: '#DEDEDB',
     },
     modalTitle: {
-        color: 'white',
+        color: '#1A1A1A',
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 20,
@@ -747,10 +749,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#2A2A4A',
+        borderBottomColor: '#DEDEDB',
     },
     pickerOptionText: {
-        color: '#A0A0B0',
+        color: '#5A5A5A',
         fontSize: 16,
     },
     pickerOptionSelected: {
@@ -778,15 +780,20 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: 50,
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 24,
         borderWidth: 2,
         borderColor: '#E94560',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 4,
     },
     successTitle: {
-        color: 'white',
+        color: '#1A1A1A',
         fontSize: 28,
         fontWeight: 'bold',
         marginBottom: 16,
@@ -800,22 +807,22 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     successSubtext: {
-        color: '#A0A0B0',
+        color: '#5A5A5A',
         fontSize: 14,
         textAlign: 'center',
-        lineHeight: 20,
+        lineHeight: 22,
         marginBottom: 8,
     },
     successEmail: {
-        color: 'white',
+        color: '#1A1A1A',
         fontSize: 16,
         fontWeight: 'bold',
         textAlign: 'center',
-        marginBottom: 30,
+        marginBottom: 32,
     },
     infoCard: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(0, 122, 255, 0.1)',
+        backgroundColor: 'rgba(0, 122, 255, 0.05)',
         padding: 16,
         borderRadius: 12,
         alignItems: 'center',

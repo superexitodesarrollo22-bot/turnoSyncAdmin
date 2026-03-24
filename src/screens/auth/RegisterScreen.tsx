@@ -86,7 +86,7 @@ const RegisterScreen = () => {
 
     if (success) {
         return (
-            <LinearGradient colors={['#1A1A2E', '#16213E']} style={styles.container}>
+            <LinearGradient colors={['#FFFFFF', '#F5F5F0']} style={styles.container}>
                 <View style={styles.successContainer}>
                     <View style={styles.successIcon}>
                         <Ionicons name="checkmark-circle" size={72} color="#4CAF50" />
@@ -109,7 +109,7 @@ const RegisterScreen = () => {
     }
 
     return (
-        <LinearGradient colors={['#1A1A2E', '#16213E']} style={styles.container}>
+        <LinearGradient colors={['#FFFFFF', '#F5F5F0']} style={styles.container}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.flex}
@@ -123,7 +123,7 @@ const RegisterScreen = () => {
                         style={styles.backButton}
                         onPress={() => navigation.goBack()}
                     >
-                        <Ionicons name="arrow-back" size={24} color="white" />
+                        <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
                     </TouchableOpacity>
 
                     <View style={styles.header}>
@@ -246,45 +246,45 @@ const styles = StyleSheet.create({
     scrollContent: { flexGrow: 1, padding: 24, paddingTop: 60 },
     backButton: { marginBottom: 24 },
     header: { marginBottom: 32 },
-    title: { fontSize: 28, fontWeight: '700', color: '#FFFFFF', marginBottom: 8 },
-    subtitle: { fontSize: 14, color: '#A0A0B0', lineHeight: 20 },
+    title: { fontSize: 28, fontWeight: '700', color: '#1A1A1A', marginBottom: 8 },
+    subtitle: { fontSize: 14, color: '#5A5A5A', lineHeight: 22 },
     form: { flex: 1 },
-    label: { fontSize: 13, fontWeight: '600', color: '#A0A0B0', marginBottom: 8, marginTop: 16 },
+    label: { fontSize: 13, fontWeight: '600', color: '#9A9A9A', marginBottom: 8, marginTop: 16 },
     input: {
-        backgroundColor: '#252540',
+        backgroundColor: '#EDEDEA',
         borderRadius: 12,
         paddingHorizontal: 16,
         paddingVertical: 14,
         fontSize: 16,
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         borderWidth: 1,
-        borderColor: '#333355',
+        borderColor: '#DEDEDB',
     },
     passwordContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#252540',
+        backgroundColor: '#EDEDEA',
         borderRadius: 12,
         paddingHorizontal: 16,
         borderWidth: 1,
-        borderColor: '#333355',
+        borderColor: '#DEDEDB',
     },
     passwordInput: {
         flex: 1,
         paddingVertical: 14,
         fontSize: 16,
-        color: '#FFFFFF',
+        color: '#1A1A1A',
     },
     errorContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#2D1A1A',
+        backgroundColor: 'rgba(233, 69, 96, 0.1)',
         borderRadius: 8,
         padding: 12,
         marginTop: 16,
         gap: 8,
     },
-    errorText: { color: '#FF6B6B', fontSize: 13, flex: 1 },
+    errorText: { color: '#E94560', fontSize: 13, flex: 1 },
     registerBtn: {
         backgroundColor: '#E94560',
         borderRadius: 12,
@@ -295,12 +295,12 @@ const styles = StyleSheet.create({
     registerBtnDisabled: { opacity: 0.6 },
     registerBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
     loginLink: { alignItems: 'center', marginTop: 20, paddingVertical: 8 },
-    loginLinkText: { color: '#A0A0B0', fontSize: 14 },
+    loginLinkText: { color: '#5A5A5A', fontSize: 14 },
     loginLinkBold: { color: '#E94560', fontWeight: '700' },
     successContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
     successIcon: { marginBottom: 24 },
-    successTitle: { fontSize: 26, fontWeight: '700', color: '#FFFFFF', marginBottom: 16 },
-    successText: { fontSize: 15, color: '#A0A0B0', textAlign: 'center', lineHeight: 22, marginBottom: 32 },
+    successTitle: { fontSize: 26, fontWeight: '700', color: '#1A1A1A', marginBottom: 16 },
+    successText: { fontSize: 15, color: '#5A5A5A', textAlign: 'center', lineHeight: 22, marginBottom: 32 },
     loginBtn: {
         backgroundColor: '#E94560',
         borderRadius: 12,

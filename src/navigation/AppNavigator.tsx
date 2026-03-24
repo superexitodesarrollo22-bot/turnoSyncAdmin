@@ -195,7 +195,7 @@ const AppNavigator = () => {
 
     return (
         <NavigationContainer ref={navigationRef} linking={linkingConfig}>
-            <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" translucent />
+            <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent />
             <Stack.Navigator
                 screenOptions={{
                     headerShown: false,

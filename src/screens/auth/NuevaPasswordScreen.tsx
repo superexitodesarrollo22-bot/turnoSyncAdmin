@@ -121,7 +121,7 @@ const NuevaPasswordScreen = () => {
 
     if (success) {
         return (
-            <LinearGradient colors={['#1A1A2E', '#16213E']} style={styles.container}>
+            <LinearGradient colors={['#FFFFFF', '#F5F5F0']} style={styles.container}>
                 <View style={styles.centeredContent}>
                     <View style={styles.successIconContainer}>
                         <Ionicons name="checkmark-circle" size={100} color="#00C853" />
@@ -141,7 +141,7 @@ const NuevaPasswordScreen = () => {
     }
 
     return (
-        <LinearGradient colors={['#1A1A2E', '#16213E']} style={styles.container}>
+        <LinearGradient colors={['#FFFFFF', '#F5F5F0']} style={styles.container}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.flex}
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         paddingHorizontal: 24,
-        paddingTop: 60,
+        paddingTop: 80,
         paddingBottom: 40,
     },
     header: {
@@ -282,50 +282,57 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#2A2A4A',
+        borderColor: '#DEDEDB',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 4,
     },
     title: {
         fontSize: 26,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         marginBottom: 10,
     },
     description: {
         fontSize: 14,
-        color: '#A0A0B0',
+        color: '#5A5A5A',
         textAlign: 'center',
         maxWidth: 280,
         lineHeight: 20,
     },
     card: {
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         borderRadius: 20,
         padding: 24,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
+        shadowOpacity: 0.1,
         shadowRadius: 10,
-        elevation: 8,
+        elevation: 4,
+        borderWidth: 1,
+        borderColor: '#DEDEDB',
     },
     inputGroup: { marginBottom: 20 },
-    label: { color: '#FFFFFF', fontSize: 14, marginBottom: 8, fontWeight: '500' },
+    label: { color: '#1A1A1A', fontSize: 14, marginBottom: 8, fontWeight: '500' },
     inputWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#2A2A4A',
+        backgroundColor: '#EDEDEA',
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#3A3A5A',
+        borderColor: '#DEDEDB',
         height: 52,
         paddingHorizontal: 16,
     },
     inputIcon: { marginRight: 12 },
-    input: { flex: 1, color: '#FFFFFF', fontSize: 16 },
+    input: { flex: 1, color: '#1A1A1A', fontSize: 16 },
     eyeIcon: { padding: 4 },
     rightIcons: { flexDirection: 'row', alignItems: 'center' },
     strengthContainer: {
@@ -354,8 +361,8 @@ const styles = StyleSheet.create({
     buttonText: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },
     centeredContent: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
     successIconContainer: { marginBottom: 30 },
-    successTitle: { fontSize: 26, fontWeight: 'bold', color: '#FFFFFF', marginBottom: 10 },
-    successSubtitle: { fontSize: 16, color: '#A0A0B0', textAlign: 'center', marginBottom: 40 },
+    successTitle: { fontSize: 26, fontWeight: 'bold', color: '#1A1A1A', marginBottom: 10 },
+    successSubtitle: { fontSize: 16, color: '#5A5A5A', textAlign: 'center', marginBottom: 40 },
     countdownText: { fontSize: 14, color: '#E94560', fontWeight: '500' },
 });
 

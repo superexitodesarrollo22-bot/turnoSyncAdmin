@@ -189,7 +189,7 @@ const LoginScreen = () => {
     };
 
     return (
-        <LinearGradient colors={['#1A1A2E', '#16213E']} style={styles.container}>
+        <LinearGradient colors={['#FFFFFF', '#F5F5F0']} style={styles.container}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.flex}
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
     appName: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         marginBottom: 20,
     },
     adminTag: {
@@ -386,28 +386,30 @@ const styles = StyleSheet.create({
     welcomeTitle: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         marginBottom: 4,
     },
     subtitle: {
         fontSize: 14,
-        color: '#A0A0B0',
+        color: '#5A5A5A',
     },
     card: {
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         borderRadius: 20,
         padding: 24,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
+        shadowOpacity: 0.1,
         shadowRadius: 10,
-        elevation: 8,
+        elevation: 4,
+        borderWidth: 1,
+        borderColor: '#DEDEDB',
     },
     inputGroup: {
         marginBottom: 20,
     },
     label: {
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         fontSize: 14,
         marginBottom: 8,
         fontWeight: '500',
@@ -415,10 +417,10 @@ const styles = StyleSheet.create({
     inputWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#2A2A4A',
+        backgroundColor: '#EDEDEA',
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#3A3A5A',
+        borderColor: '#DEDEDB',
         height: 52,
         paddingHorizontal: 16,
     },
@@ -427,7 +429,7 @@ const styles = StyleSheet.create({
     },
     input: {
         flex: 1,
-        color: '#FFFFFF',
+        color: '#1A1A1A',
         fontSize: 16,
     },
     eyeIcon: {
@@ -477,10 +479,10 @@ const styles = StyleSheet.create({
     line: {
         flex: 1,
         height: 1,
-        backgroundColor: '#2A2A4A',
+        backgroundColor: '#DEDEDB',
     },
     separatorText: {
-        color: '#A0A0B0',
+        color: '#5A5A5A',
         paddingHorizontal: 16,
         fontSize: 14,
     },
@@ -488,12 +490,13 @@ const styles = StyleSheet.create({
         height: 52,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#E94560',
+        borderColor: '#BCBCBC',
         justifyContent: 'center',
         alignItems: 'center',
+        marginTop: 20,
     },
     subscribeButtonText: {
-        color: '#E94560',
+        color: '#5A5A5A',
         fontSize: 16,
         fontWeight: '600',
     },

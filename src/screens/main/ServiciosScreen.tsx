@@ -485,7 +485,7 @@ const ServiciosScreen = () => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#1A1A2E', '#16213E']} style={styles.header}>
+            <LinearGradient colors={['#FFFFFF', '#F5F5F0']} style={styles.header}>
                 <View style={styles.headerTitleRow}>
                     <Text style={styles.headerTitle}>Gestión</Text>
                 </View>
@@ -701,24 +701,24 @@ const ServiciosScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#1A1A2E' },
-    header: { paddingTop: Platform.OS === 'ios' ? 50 : 30, paddingBottom: 20, paddingHorizontal: 20, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 },
+    container: { flex: 1, backgroundColor: '#F5F5F0' },
+    header: { paddingTop: Platform.OS === 'ios' ? 50 : 30, paddingBottom: 20, paddingHorizontal: 20, borderBottomLeftRadius: 24, borderBottomRightRadius: 24, borderBottomWidth: 1, borderBottomColor: '#DEDEDB' },
     headerTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-    headerTitle: { color: 'white', fontSize: 26, fontWeight: 'bold' },
-    tabsContainer: { flexDirection: 'row', backgroundColor: '#16213E', borderRadius: 12, padding: 4 },
+    headerTitle: { color: '#1A1A1A', fontSize: 26, fontWeight: 'bold' },
+    tabsContainer: { flexDirection: 'row', backgroundColor: '#EDEDEA', borderRadius: 12, padding: 4 },
     tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
     tabActive: { backgroundColor: '#E94560' },
-    tabText: { color: '#A0A0B0', fontSize: 14, fontWeight: 'bold' },
+    tabText: { color: '#5A5A5A', fontSize: 14, fontWeight: 'bold' },
     tabTextActive: { color: 'white' },
     content: { flex: 1 },
     loadingCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     listContainer: { padding: 12, paddingBottom: 100 },
     card: {
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         borderRadius: 12,
         marginBottom: 8,
         borderWidth: 1,
-        borderColor: '#2A2A4A',
+        borderColor: '#DEDEDB',
         flexDirection: 'row',
         overflow: 'hidden',
     },
@@ -753,8 +753,8 @@ const styles = StyleSheet.create({
     },
     avatarText: { color: 'white', fontSize: 13, fontWeight: 'bold' },
     cardMain: { flex: 1 },
-    cardTitle: { color: 'white', fontSize: 14, fontWeight: '700' },
-    cardSubtitle: { color: '#A0A0B0', fontSize: 12, marginTop: 1 },
+    cardTitle: { color: '#1A1A1A', fontSize: 14, fontWeight: '700' },
+    cardSubtitle: { color: '#5A5A5A', fontSize: 12, marginTop: 1 },
     cardRight: { alignItems: 'flex-end' },
     switch: {
         transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }],
@@ -765,7 +765,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderTopWidth: 1,
-        borderTopColor: '#2A2A4A',
+        borderTopColor: '#DEDEDB',
         paddingTop: 6,
     },
     actionBtn: {
@@ -783,7 +783,7 @@ const styles = StyleSheet.create({
     actionDivider: {
         width: 1,
         height: 14,
-        backgroundColor: '#2A2A4A',
+        backgroundColor: '#DEDEDB',
         marginHorizontal: 8,
     },
     statusPill: {
@@ -791,45 +791,59 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 2,
         borderRadius: 20,
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: 'rgba(0,0,0,0.05)',
     },
     statusPillText: {
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 0.5,
     },
-    fab: { position: 'absolute', bottom: 30, right: 20, backgroundColor: '#E94560', width: 60, height: 60, borderRadius: 30, justifyContent: 'center', alignItems: 'center', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 5 },
-    emptyContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 100 },
-    emptyTitle: { color: 'white', fontSize: 20, fontWeight: 'bold', marginTop: 20 },
-    emptySubtitle: { color: '#A0A0B0', fontSize: 14, textAlign: 'center', marginTop: 10, paddingHorizontal: 40, lineHeight: 22 },
+    fab: {
+        position: 'absolute',
+        bottom: 30,
+        right: 20,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: '#E94560',
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 6,
+        shadowColor: '#E94560',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+    },
+    emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 100 },
+    emptyTitle: { color: '#9A9A9A', fontSize: 18, marginTop: 15, fontWeight: 'bold' },
+    emptySubtitle: { color: '#5A5A5A', fontSize: 14, textAlign: 'center', marginTop: 10, paddingHorizontal: 40, lineHeight: 22 },
     emptyBtn: { backgroundColor: '#E94560', paddingHorizontal: 30, paddingVertical: 14, borderRadius: 15, marginTop: 30 },
     emptyBtnText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+
     // Modal
-    modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
-    modalContent: { backgroundColor: '#1E1E3A', borderTopLeftRadius: 30, borderTopRightRadius: 30, padding: 25, maxHeight: height * 0.9 },
-    modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 },
-    modalTitle: { color: 'white', fontSize: 22, fontWeight: 'bold' },
+    modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+    modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 30, borderTopRightRadius: 30, padding: 24, maxHeight: height * 0.9 },
+    modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+    modalTitle: { color: '#1A1A1A', fontSize: 20, fontWeight: 'bold' },
     inputGroup: { marginBottom: 20 },
-    label: { color: 'white', fontSize: 14, fontWeight: '600', marginBottom: 10 },
-    input: { backgroundColor: '#2A2A4A', borderRadius: 12, height: 55, paddingHorizontal: 15, color: 'white', fontSize: 16, borderWidth: 1, borderColor: '#3A3A5A' },
-    durationGrid: { flexDirection: 'row', flexWrap: 'wrap', margin: -5 },
-    durationBtn: { width: (width - 70) / 3, margin: 5, backgroundColor: '#2A2A4A', height: 45, borderRadius: 10, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#3A3A5A' },
+    label: { color: '#3A3A3A', fontSize: 14, fontWeight: 'bold', marginBottom: 8 },
+    input: { backgroundColor: '#EDEDEA', borderRadius: 12, paddingHorizontal: 16, height: 50, color: '#1A1A1A', borderWidth: 1, borderColor: '#DEDEDB' },
+    durationGrid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -4 },
+    durationBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, backgroundColor: '#EDEDEA', margin: 4, borderWidth: 1, borderColor: '#DEDEDB' },
     durationBtnActive: { backgroundColor: '#E94560', borderColor: '#E94560' },
-    durationBtnText: { color: '#A0A0B0', fontSize: 14, fontWeight: '500' },
+    durationBtnText: { color: '#5A5A5A', fontSize: 13 },
     durationBtnTextActive: { color: 'white', fontWeight: 'bold' },
-    customDurationRow: { flexDirection: 'row', alignItems: 'center', marginTop: 15 },
-    suffix: { color: '#A0A0B0', marginLeft: 12, fontSize: 15 },
-    priceRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#2A2A4A', borderRadius: 12, height: 55, paddingHorizontal: 15, borderWidth: 1, borderColor: '#3A3A5A' },
-    currency: { color: '#A0A0B0', fontSize: 18, marginRight: 10 },
-    priceInput: { flex: 1, color: 'white', fontSize: 18, fontWeight: 'bold' },
-    modalToggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 15, borderTopWidth: 1, borderTopColor: '#2A2A4A', marginBottom: 15 },
-    saveBtn: { height: 55, borderRadius: 15, overflow: 'hidden', marginTop: 10 },
-    saveGradient: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    saveBtnText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+    customDurationRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
+    suffix: { color: '#5A5A5A', marginLeft: 10, fontSize: 14 },
+    priceRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#EDEDEA', borderRadius: 12, paddingHorizontal: 16, height: 50, borderWidth: 1, borderColor: '#DEDEDB' },
+    currency: { color: '#5A5A5A', fontSize: 18, fontWeight: 'bold', marginRight: 4 },
+    priceInput: { flex: 1, color: '#1A1A1A', fontSize: 16, fontWeight: 'bold' },
+    modalToggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
+
     // Staff extras
-    avatarPreviewCenter: { alignItems: 'center', marginBottom: 25 },
-    avatarCircleLarge: { width: 100, height: 100, borderRadius: 50, justifyContent: 'center', alignItems: 'center', elevation: 5 },
-    avatarTextLarge: { color: 'white', fontSize: 36, fontWeight: 'bold' },
+    avatarPreviewCenter: { alignItems: 'center', marginBottom: 20 },
+    avatarCircleLarge: { width: 80, height: 80, borderRadius: 40, justifyContent: 'center', alignItems: 'center' },
+    avatarTextLarge: { color: 'white', fontSize: 32, fontWeight: 'bold' },
 });
 
 export default ServiciosScreen;

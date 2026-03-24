@@ -90,10 +90,10 @@ const NotificacionesConfigScreen = ({ navigation }: any) => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#1A1A2E', '#16213E']} style={styles.header}>
+            <LinearGradient colors={['#FFFFFF', '#F5F5F0']} style={styles.header}>
                 <View style={styles.headerTop}>
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-                        <Ionicons name="arrow-back" size={24} color="white" />
+                        <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
                     </TouchableOpacity>
                     <Text style={styles.headerTitle}>Notificaciones</Text>
                 </View>
@@ -216,29 +216,29 @@ const NotificacionesConfigScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#1A1A2E' },
-    header: { paddingTop: Platform.OS === 'ios' ? 60 : 40, paddingBottom: 20, paddingHorizontal: 20 },
+    container: { flex: 1, backgroundColor: '#F5F5F0' },
+    header: { paddingTop: Platform.OS === 'ios' ? 60 : 40, paddingBottom: 20, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: '#DEDEDB' },
     headerTop: { flexDirection: 'row', alignItems: 'center' },
     backBtn: { padding: 5, marginRight: 15 },
-    headerTitle: { color: 'white', fontSize: 20, fontWeight: 'bold' },
+    headerTitle: { color: '#1A1A1A', fontSize: 20, fontWeight: 'bold' },
     scroll: { padding: 20 },
     section: { marginBottom: 25 },
-    sectionTitle: { color: '#A0A0B0', fontSize: 12, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, marginLeft: 5 },
-    card: { backgroundColor: '#1E1E3A', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#2A2A4A' },
+    sectionTitle: { color: '#5A5A5A', fontSize: 12, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, marginLeft: 5 },
+    card: { backgroundColor: '#FFFFFF', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#DEDEDB' },
     row: { flexDirection: 'row', alignItems: 'center' },
     iconContainer: { width: 40, height: 40, borderRadius: 10, backgroundColor: 'rgba(233, 69, 96, 0.1)', justifyContent: 'center', alignItems: 'center' },
     rowContent: { flex: 1, marginLeft: 15 },
-    cardTitle: { color: 'white', fontSize: 16, fontWeight: 'bold' },
-    cardSubtitle: { color: '#A0A0B0', fontSize: 12, marginTop: 2 },
+    cardTitle: { color: '#1A1A1A', fontSize: 16, fontWeight: 'bold' },
+    cardSubtitle: { color: '#5A5A5A', fontSize: 12, marginTop: 2 },
     valueText: { color: '#E94560', fontWeight: 'bold', fontSize: 14, marginRight: 10 },
     optionsGrid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -5, marginTop: 10 },
-    optionBtn: { flex: 1, minWidth: '30%', backgroundColor: '#2A2A4A', borderRadius: 8, paddingVertical: 10, alignItems: 'center', margin: 5, borderWidth: 1, borderColor: '#3A3A5A' },
+    optionBtn: { flex: 1, minWidth: '30%', backgroundColor: '#EDEDEA', borderRadius: 8, paddingVertical: 10, alignItems: 'center', margin: 5, borderWidth: 1, borderColor: '#DEDEDB' },
     optionBtnActive: { backgroundColor: '#E94560', borderColor: '#E94560' },
-    optionText: { color: '#A0A0B0', fontSize: 12, fontWeight: '600' },
+    optionText: { color: '#5A5A5A', fontSize: 12, fontWeight: '600' },
     optionTextActive: { color: 'white' },
-    divider: { height: 1, backgroundColor: '#2A2A4A', marginVertical: 15 },
+    divider: { height: 1, backgroundColor: '#DEDEDB', marginVertical: 15 },
     footer: { marginTop: 10, paddingHorizontal: 10, alignItems: 'center' },
-    footerText: { color: '#606070', fontSize: 12, textAlign: 'center', lineHeight: 18 },
+    footerText: { color: '#9A9A9A', fontSize: 12, textAlign: 'center', lineHeight: 18 },
     settingsBtn: { flexDirection: 'row', alignItems: 'center', marginTop: 20, padding: 10 },
     settingsBtnText: { color: '#4A9FFF', fontSize: 14, fontWeight: '600', marginLeft: 8 },
 });
