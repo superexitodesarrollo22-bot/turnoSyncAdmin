@@ -105,54 +105,77 @@ const LoginScreen = () => {
             const user = data.user;
             if (!user) throw new Error('Usuario no encontrado tras login');
 
-            const { data: profile, error: profileError } = await supabase
-                .from('users')
-                .select('id, full_name')
-                .eq('supabase_auth_uid', user.id)
-                .single();
-
-            if (profileError || !profile) {
-                throw new Error('No se pudo encontrar el perfil de usuario');
-            }
-
-            // Verificar si es superuser — si lo es, permitir login directo
-            const { data: profileFull } = await supabase
+            // 1. Obtener perfil del usuario con manejo robusto
+            const { data: profileFull, error: profileError } = await supabase
                 .from('users')
                 .select('id, full_name, is_superuser')
                 .eq('supabase_auth_uid', user.id)
                 .single();
 
-            if (profileFull?.is_superuser) {
-                // Superuser: no necesita business_users, dejar que AuthContext maneje
-                console.log('[Login] Superuser detectado, acceso permitido');
+            if (profileError || !profileFull) {
+                setErrorMsg('No se pudo encontrar el perfil de usuario.');
+                setLoading(false);
                 return;
             }
 
-            // Usuario normal: verificar que sea admin/owner de un negocio
-            const { data: bizUser, error: bizUserError } = await supabase
-                .from('business_users')
-                .select('business_id')
-                .eq('user_id', profile.id)
-                .in('role', ['admin', 'owner'])
-                .single();
+            // 2. Si es superuser, permitir acceso directo sin verificar business_users
+            if (profileFull.is_superuser) {
+                console.log('[Login] Superuser detectado, acceso permitido');
+                // El AuthContext se encargará de la navegación via onAuthStateChange
+                return;
+            }
 
-            if (bizUserError || !bizUser) {
+            // 3. Verificar permisos de admin con reintentos (para mitigar lag de RLS)
+            let bizUser = null;
+            let intentos = 0;
+            
+            while (!bizUser && intentos < 3) {
+                intentos++;
+                console.log(`[Login] Verificando permisos, intento ${intentos}...`);
+                
+                const { data, error } = await supabase
+                    .from('business_users')
+                    .select('business_id, role')
+                    .eq('user_id', profileFull.id)
+                    .in('role', ['admin', 'owner'])
+                    .maybeSingle(); // Usar maybeSingle para no lanzar error si no hay resultado
+                
+                if (!error && data) {
+                    bizUser = data;
+                } else if (error) {
+                    console.warn(`[Login] Intento ${intentos} fallido:`, error.message);
+                    // Esperar 500ms antes del siguiente intento si hubo un error de red/RLS
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                } else {
+                    // No hay error pero tampoco datos - el usuario probablemente no tiene permisos
+                    // En el primer intento fallido sin error, esperamos un poco por si es lag de RLS
+                    if (intentos === 1) {
+                        await new Promise(resolve => setTimeout(resolve, 800));
+                    } else {
+                        break; 
+                    }
+                }
+            }
+
+            if (!bizUser) {
+                console.error('[Login] El usuario no tiene permisos de admin tras reintentos');
                 await supabase.auth.signOut();
                 setErrorMsg('Tu cuenta no tiene permisos de administrador.');
                 setLoading(false);
                 return;
             }
 
-            await supabase.from('audit_logs').insert({
+            // 4. Registrar audit log (sin await para no bloquear la entrada)
+            supabase.from('audit_logs').insert({
                 business_id: bizUser.business_id,
-                user_id: profile.id,
+                user_id: profileFull.id,
                 action: 'admin_login',
                 metadata: {
                     timestamp: new Date().toISOString(),
                     platform: 'TurnoSyncAdmin',
                     device: Platform.OS
                 }
-            });
+            }).catch(err => console.warn('[Login] Error al registrar audit log:', err.message));
         } catch (error: any) {
             console.error('Login error:', error);
             setErrorMsg(error.message || 'Ocurrió un error inesperado');

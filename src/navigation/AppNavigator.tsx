@@ -42,7 +42,7 @@ export const navigationRef = createNavigationContainerRef<any>();
 type AppStage = 'splash' | 'auth' | 'onboarding' | 'main' | 'superuser';
 
 const AppNavigator = () => {
-    const { session, business, isSuperuser } = useAuth();
+    const { session, business, isSuperuser, loading } = useAuth();
     const [stage, setStage] = useState<AppStage>('splash');
 
     const checkNavigationState = useCallback(async () => {
@@ -86,16 +86,34 @@ const AppNavigator = () => {
                 }
             } catch (error) {
                 console.error('Error checking new admin status:', error);
-                setStage('main');
+                setStage('main'); // El error de RLS puede caer aquí, vamos a main
             }
+            return;
+        }
+
+        // NUEVO: Manejar caso donde hay sesión pero no hay business
+        if (session && !business) {
+            setStage('auth');
+            return;
         }
     }, [session, business, isSuperuser]);
 
+    // Timeout de seguridad para el Splash Screen (6 segundos máximo)
     useEffect(() => {
-        if (stage !== 'splash') {
+        const timer = setTimeout(() => {
+            if (stage === 'splash') {
+                console.warn('[Safety] Splash timeout triggered. Forcing transition.');
+                handleSplashFinish();
+            }
+        }, 6000);
+        return () => clearTimeout(timer);
+    }, [stage]);
+
+    useEffect(() => {
+        if (stage !== 'splash' && !loading) {
             checkNavigationState();
         }
-    }, [session, business, isSuperuser, checkNavigationState]);
+    }, [session, business, isSuperuser, loading, stage, checkNavigationState]);
 
     // Manejo de Deep Links
     useEffect(() => {
@@ -163,8 +181,11 @@ const AppNavigator = () => {
             setStage('auth');
         } else if (isSuperuser) {
             setStage('superuser');
-        } else {
+        } else if (business) {
             checkNavigationState();
+        } else {
+            // Caso de error en carga o sin negocio
+            setStage('auth');
         }
     };
 

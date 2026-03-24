@@ -27,42 +27,52 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const loadUserData = useCallback(async (userId: string) => {
         try {
-            // Cargar Perfil
+            // 1. Cargar Perfil
             const { data: profile, error: profileError } = await supabase
                 .from('users')
                 .select('*')
                 .eq('supabase_auth_uid', userId)
                 .single();
 
-            if (profileError) throw profileError;
+            if (profileError || !profile) {
+                // Si no hay perfil, no lanzamos error, simplemente retornamos
+                console.warn('Profile not found for user:', userId);
+                return;
+            }
             setUserProfile(profile);
 
             // Detectar superuser
-            if (profile?.is_superuser) {
+            if (profile.is_superuser) {
                 setIsSuperuser(true);
                 setBusiness(null);
                 // No registrar push ni cargar business para el superuser
                 return;
             }
 
-            // Flujo normal para admins
             setIsSuperuser(false);
 
-            // Registro de notificaciones
-            const token = await registerForPushNotifications(profile.id);
-            setExpoPushToken(token);
+            // 2. Registro de notificaciones (Fire and forget)
+            registerForPushNotifications(profile.id).catch(err => {
+                console.warn('Error registering notifications:', err.message);
+            });
 
-            // Cargar Negocio asociado (vía business_users)
-            const { data: bizUser, error: bizError } = await supabase
-                .from('business_users')
-                .select('business_id, businesses(*)')
-                .eq('user_id', profile.id)
-                .in('role', ['admin', 'owner'])
-                .single();
+            // 3. Cargar Negocio asociado (vía business_users)
+            try {
+                const { data: bizUser, error: bizError } = await supabase
+                    .from('business_users')
+                    .select('business_id, businesses(*)')
+                    .eq('user_id', profile.id)
+                    .in('role', ['admin', 'owner'])
+                    .single();
 
-            if (bizUser && bizUser.businesses) {
-                setBusiness(bizUser.businesses as unknown as Business);
-            } else {
+                if (bizUser && bizUser.businesses) {
+                    setBusiness(bizUser.businesses as unknown as Business);
+                } else {
+                    setBusiness(null);
+                }
+            } catch (bizError: any) {
+                // Si falla la carga del negocio, seteamos null y continuamos
+                console.error('Error loading business:', bizError.message);
                 setBusiness(null);
             }
         } catch (error: any) {
@@ -80,7 +90,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const initializeAuth = async () => {
             try {
-                const { data: { session: initialSession } } = await supabase.auth.getSession();
+                const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
+                if (sessionError) throw sessionError;
+                
                 setSession(initialSession);
 
                 if (initialSession) {
@@ -89,6 +101,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             } catch (error) {
                 console.error('Error initializing auth:', error);
             } finally {
+                // ESTO ES CRÍTICO: Asegurar que el SplashScreen desaparezca pase lo que pase
                 setLoading(false);
             }
         };
