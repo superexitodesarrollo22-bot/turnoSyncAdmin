@@ -165,17 +165,21 @@ const LoginScreen = () => {
                 return;
             }
 
-            // 4. Registrar audit log (sin await para no bloquear la entrada)
-            supabase.from('audit_logs').insert({
-                business_id: bizUser.business_id,
-                user_id: profileFull.id,
-                action: 'admin_login',
-                metadata: {
-                    timestamp: new Date().toISOString(),
-                    platform: 'TurnoSyncAdmin',
-                    device: Platform.OS
-                }
-            }).catch(err => console.warn('[Login] Error al registrar audit log:', err.message));
+            // 4. Registrar audit log (sin bloquear la entrada)
+            try {
+                await supabase.from('audit_logs').insert({
+                    business_id: bizUser.business_id,
+                    user_id: profileFull.id,
+                    action: 'admin_login',
+                    metadata: {
+                        timestamp: new Date().toISOString(),
+                        platform: 'TurnoSyncAdmin',
+                        device: Platform.OS
+                    }
+                });
+            } catch (auditError) {
+                console.warn('[Login] Audit log falló, ignorando:', auditError);
+            }
         } catch (error: any) {
             console.error('Login error:', error);
             setErrorMsg(error.message || 'Ocurrió un error inesperado');

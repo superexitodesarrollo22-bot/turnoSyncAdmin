@@ -512,7 +512,7 @@ const HorariosScreen = () => {
                         <View style={styles.timePickersRow}>
                             <View style={styles.timeCol}>
                                 <Text style={styles.timeLabel}>Apertura</Text>
-                                <ScrollView style={styles.timeList} showsVerticalScrollIndicator={false}>
+                                <ScrollView style={styles.timeList} showsVerticalScrollIndicator={true}>
                                     {Array.from({ length: 18 }, (_, i) => i + 6).map(h => (
                                         ['00', '15', '30', '45'].map(m => {
                                             const t = `${String(h).padStart(2, '0')}:${m}`;
@@ -531,7 +531,7 @@ const HorariosScreen = () => {
                             </View>
                             <View style={styles.timeCol}>
                                 <Text style={styles.timeLabel}>Cierre</Text>
-                                <ScrollView style={styles.timeList} showsVerticalScrollIndicator={false}>
+                                <ScrollView style={styles.timeList} showsVerticalScrollIndicator={true}>
                                     {Array.from({ length: 18 }, (_, i) => i + 6).map(h => (
                                         ['00', '15', '30', '45'].map(m => {
                                             const t = `${String(h).padStart(2, '0')}:${m}`;
@@ -670,15 +670,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginBottom: 20,
         gap: 12,
+        height: 280,
     },
-    timeCol: { flex: 1, paddingHorizontal: 10 },
+    timeCol: { flex: 1, paddingHorizontal: 10, overflow: 'hidden' },
     timeLabel: { color: '#A0A0B0', fontSize: 12, textAlign: 'center', marginBottom: 10, fontWeight: 'bold' },
     timeList: {
-        height: 260,
+        height: 220,
         backgroundColor: '#16213E',
         borderRadius: 12,
+        flexGrow: 0,
     },
-    timeOption: { paddingVertical: 12, alignItems: 'center' },
+    timeOption: { 
+        paddingVertical: 12, 
+        alignItems: 'center',
+        minHeight: 44,
+    },
     timeOptionActive: { backgroundColor: '#E94560' },
     timeOptionText: { color: '#A0A0B0', fontSize: 16 },
     timeActiveText: { color: 'white', fontWeight: 'bold' },
@@ -780,6 +786,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 24,
         padding: 24,
         paddingBottom: 36,
+        maxHeight: '85%',
     },
     bottomSheetHandle: {
         width: 40,
