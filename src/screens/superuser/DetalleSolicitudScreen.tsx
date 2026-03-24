@@ -241,7 +241,7 @@ export default function DetalleSolicitudScreen({ navigation, route }: any) {
                         <TextInput
                             style={styles.motivoInput}
                             placeholder="Ej: Información incompleta, negocio duplicado..."
-                            placeholderTextColor="#6060780"
+                            placeholderTextColor="#9A9A9A"
                             multiline
                             numberOfLines={4}
                             value={motivoRechazo}

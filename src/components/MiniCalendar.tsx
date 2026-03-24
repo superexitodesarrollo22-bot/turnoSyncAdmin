@@ -102,11 +102,11 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
             {/* Header Mes */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => changeMonth('prev')} style={styles.navBtn}>
-                    <Ionicons name="chevron-back" size={20} color="white" />
+                    <Ionicons name="chevron-back" size={20} color="#1A1A1A" />
                 </TouchableOpacity>
                 <Text style={styles.monthTitle}>{MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}</Text>
                 <TouchableOpacity onPress={() => changeMonth('next')} style={styles.navBtn}>
-                    <Ionicons name="chevron-forward" size={20} color="white" />
+                    <Ionicons name="chevron-forward" size={20} color="#1A1A1A" />
                 </TouchableOpacity>
             </View>
 
@@ -154,7 +154,7 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#1E1E3A',
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 16,
         width: '100%',
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
         padding: 8,
     },
     monthTitle: {
-        color: 'white',
+        color: '#1A1A1A',
         fontSize: 16,
         fontWeight: 'bold',
     },
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     weekdayText: {
-        color: '#3A3A5A',
+        color: '#9A9A9A',
         fontSize: 12,
         fontWeight: 'bold',
         width: (width - 80) / 7,
@@ -199,11 +199,11 @@ const styles = StyleSheet.create({
         borderRadius: 20,
     },
     dayText: {
-        color: 'white',
+        color: '#1A1A1A',
         fontSize: 14,
     },
     notCurrentText: {
-        color: '#3A3A5A',
+        color: '#C0C0C0',
     },
     selectedCell: {
         backgroundColor: '#E94560',
@@ -214,6 +214,7 @@ const styles = StyleSheet.create({
     },
     selectedText: {
         fontWeight: 'bold',
+        color: '#FFFFFF',
     },
     todayText: {
         color: '#E94560',

@@ -44,10 +44,19 @@ const Toast = forwardRef<ToastRef>((_, ref) => {
 
     const getBackgroundColor = () => {
         switch (type) {
+            case 'success': return '#F0FDF4';
+            case 'error': return '#FFF1F2';
+            case 'info': return '#EFF6FF';
+            default: return '#F5F5F0';
+        }
+    };
+
+    const getAccentColor = () => {
+        switch (type) {
             case 'success': return '#2ECC71';
             case 'error': return '#E94560';
             case 'info': return '#4A9FFF';
-            default: return '#1E1E3A';
+            default: return '#5A5A5A';
         }
     };
 
@@ -69,10 +78,14 @@ const Toast = forwardRef<ToastRef>((_, ref) => {
         <Animated.View
             style={[
                 styles.container,
-                { backgroundColor: getBackgroundColor(), transform: [{ translateY }] },
+                {
+                    backgroundColor: getBackgroundColor(),
+                    borderLeftColor: getAccentColor(),
+                    transform: [{ translateY }]
+                },
             ]}
         >
-            <Ionicons name={getIcon() as any} size={24} color="white" style={styles.icon} />
+            <Ionicons name={getIcon() as any} size={24} color={getAccentColor()} style={styles.icon} />
             <Text style={styles.text}>{message}</Text>
         </Animated.View>
     );
@@ -91,15 +104,16 @@ const styles = StyleSheet.create({
         zIndex: 9999,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
+        shadowOpacity: 0.1,
         shadowRadius: 5,
         elevation: 10,
+        borderLeftWidth: 4,
     },
     icon: {
         marginRight: 12,
     },
     text: {
-        color: 'white',
+        color: '#1A1A1A',
         fontSize: 14,
         fontWeight: '600',
         flex: 1,

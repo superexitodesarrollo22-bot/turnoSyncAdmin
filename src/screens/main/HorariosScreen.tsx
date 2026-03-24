@@ -287,7 +287,7 @@ const HorariosScreen = () => {
                     <Switch
                         value={isActive}
                         onValueChange={(val) => handleToggleDay(dayIndex, val)}
-                        trackColor={{ false: '#3A3A5A', true: '#E94560' }}
+                        trackColor={{ false: '#DEDEDB', true: '#E94560' }}
                     />
                     <Text style={[styles.dayName, !isActive && styles.disabledText]}>{WEEKDAYS[dayIndex]}</Text>
                 </View>
@@ -410,7 +410,7 @@ const HorariosScreen = () => {
 
                     {blackoutDates.length === 0 ? (
                         <View style={styles.emptyContainer}>
-                            <Ionicons name="calendar-outline" size={40} color="#2A2A4A" />
+                            <Ionicons name="calendar-outline" size={40} color="#DEDEDB" />
                             <Text style={styles.emptyText}>No tienes días bloqueados</Text>
                         </View>
                     ) : (
@@ -579,7 +579,7 @@ const HorariosScreen = () => {
                         <ScrollView showsVerticalScrollIndicator={false}>
                             <View style={styles.toggleRow}>
                                 <Text style={styles.label}>Rango de fechas</Text>
-                                <Switch value={isRange} onValueChange={setIsRange} trackColor={{ false: '#3A3A5A', true: '#E94560' }} />
+                                <Switch value={isRange} onValueChange={setIsRange} trackColor={{ false: '#DEDEDB', true: '#E94560' }} />
                             </View>
 
                             <MiniCalendar

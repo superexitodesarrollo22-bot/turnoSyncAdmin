@@ -172,13 +172,13 @@ const PerfilScreen = ({ navigation }: any) => {
                             value={fullName}
                             onChangeText={setFullName}
                             placeholder="Tu nombre"
-                            placeholderTextColor="#606080"
+                            placeholderTextColor="#9A9A9A"
                         />
 
                         <Label text="Email" />
                         <View style={[styles.input, styles.inputDisabled]}>
-                            <Ionicons name="lock-closed" size={16} color="#606080" style={{ marginRight: 10 }} />
-                            <Text style={{ color: '#606080' }}>{userProfile?.email}</Text>
+                            <Ionicons name="lock-closed" size={16} color="#9A9A9A" style={{ marginRight: 10 }} />
+                            <Text style={{ color: '#9A9A9A' }}>{userProfile?.email}</Text>
                         </View>
                         <Text style={styles.infoText}>Para cambiar tu email contacta al soporte.</Text>
 
@@ -202,7 +202,7 @@ const PerfilScreen = ({ navigation }: any) => {
                             value={bizName}
                             onChangeText={setBizName}
                             placeholder="Nombre"
-                            placeholderTextColor="#606080"
+                            placeholderTextColor="#9A9A9A"
                         />
 
                         <Label text="Descripción" />
@@ -211,7 +211,7 @@ const PerfilScreen = ({ navigation }: any) => {
                             value={bizDesc}
                             onChangeText={setBizDesc}
                             placeholder="Breve descripción..."
-                            placeholderTextColor="#606080"
+                            placeholderTextColor="#9A9A9A"
                             multiline
                             maxLength={200}
                         />
@@ -222,7 +222,7 @@ const PerfilScreen = ({ navigation }: any) => {
                             value={bizAddress}
                             onChangeText={setBizAddress}
                             placeholder="Dirección física"
-                            placeholderTextColor="#606080"
+                            placeholderTextColor="#9A9A9A"
                         />
 
                         <View style={styles.row}>
@@ -233,7 +233,7 @@ const PerfilScreen = ({ navigation }: any) => {
                                     value={bizPhone}
                                     onChangeText={setBizPhone}
                                     placeholder="Teléfono"
-                                    placeholderTextColor="#606080"
+                                    placeholderTextColor="#9A9A9A"
                                     keyboardType="phone-pad"
                                 />
                             </View>
@@ -244,7 +244,7 @@ const PerfilScreen = ({ navigation }: any) => {
                                     value={bizWhatsapp}
                                     onChangeText={setBizWhatsapp}
                                     placeholder="WhatsApp"
-                                    placeholderTextColor="#606080"
+                                    placeholderTextColor="#9A9A9A"
                                     keyboardType="phone-pad"
                                 />
                             </View>

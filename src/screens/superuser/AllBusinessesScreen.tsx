@@ -186,7 +186,7 @@ export default function AllBusinessesScreen({ navigation }: any) {
 
     const EmptyState = () => (
         <View style={styles.emptyState}>
-            <Ionicons name="business-outline" size={64} color="#2A2A48" />
+            <Ionicons name="business-outline" size={64} color="#DEDEDB" />
             <Text style={styles.emptyTitle}>
                 {searchText ? 'Sin resultados' : 'No hay negocios'}
             </Text>
@@ -217,7 +217,7 @@ export default function AllBusinessesScreen({ navigation }: any) {
                 <TextInput
                     style={styles.searchInput}
                     placeholder="Buscar negocio..."
-                    placeholderTextColor="#6060780"
+                    placeholderTextColor="#9A9A9A"
                     value={searchText}
                     onChangeText={setSearchText}
                     returnKeyType="search"
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        backgroundColor: '#F5F5F0',
+        backgroundColor: '#EDEDEA',
         borderRadius: 8,
         paddingHorizontal: 8,
         paddingVertical: 5,

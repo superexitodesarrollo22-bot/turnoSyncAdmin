@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 
-const BASE_COLOR = '#2E2E50';
-const SHIMMER_COLOR = '#3A3A60';
-const CARD_BG = '#1A1A2E';
+const BASE_COLOR = '#E0E0DC';
+const SHIMMER_COLOR = '#F0F0EC';
+const CARD_BG = '#FFFFFF';
 
 interface SkeletonBoxProps {
     width?: number | string;

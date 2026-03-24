@@ -240,7 +240,7 @@ const DashboardScreen = () => {
                         </View>
 
                         {/* KPI Semanal */}
-                        <PremiumCard gradient style={styles.weeklyCard}>
+                        <PremiumCard gradient gradientColors={['#F5F5F0', '#EFEFEB']} style={styles.weeklyCard}>
                             <View style={styles.weeklyHeader}>
                                 <Text style={styles.weeklyTitle}>ESTA SEMANA</Text>
                                 <Ionicons name="stats-chart" size={18} color="#E94560" />
@@ -266,7 +266,7 @@ const DashboardScreen = () => {
 
                         <View style={styles.upcomingList}>
                             {upcomingAppointments.length === 0 ? (
-                                <View style={{ minHeight: 180, backgroundColor: '#1E1E3A', borderRadius: 16, borderColor: '#2A2A4A', borderWidth: 1 }}>
+                                <View style={{ minHeight: 180, backgroundColor: '#FFFFFF', borderRadius: 16, borderColor: '#DEDEDB', borderWidth: 1 }}>
                                     <EmptyState
                                         icon="calendar-outline"
                                         title="Sin citas próximas"

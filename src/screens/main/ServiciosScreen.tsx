@@ -396,7 +396,7 @@ const ServiciosScreen = () => {
     const renderServiceItem = ({ item, index }: { item: Service, index: number }) => (
         <FadeInView delay={index * 60}>
             <AnimatedPressable style={styles.card}>
-                <View style={[styles.cardAccent, { backgroundColor: item.active ? '#2ECC71' : '#3A3A5A' }]} />
+                <View style={[styles.cardAccent, { backgroundColor: item.active ? '#2ECC71' : '#DEDEDB' }]} />
                 <View style={styles.cardInner}>
                     <View style={styles.cardHeader}>
                         <View style={styles.iconContainer}>
@@ -442,7 +442,7 @@ const ServiciosScreen = () => {
     const renderStaffItem = ({ item, index }: { item: Staff, index: number }) => (
         <FadeInView delay={index * 60}>
             <AnimatedPressable style={styles.card}>
-                <View style={[styles.cardAccent, { backgroundColor: item.active ? '#4A9FFF' : '#3A3A5A' }]} />
+                <View style={[styles.cardAccent, { backgroundColor: item.active ? '#4A9FFF' : '#DEDEDB' }]} />
                 <View style={styles.cardInner}>
                     <View style={styles.cardHeader}>
                         <View style={[styles.avatarCircle, { backgroundColor: getAvatarColor(item.name) }]}>
@@ -568,7 +568,7 @@ const ServiciosScreen = () => {
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Ej: Corte de cabello"
-                                    placeholderTextColor="#606070"
+                                    placeholderTextColor="#9A9A9A"
                                     value={serviceName}
                                     onChangeText={setServiceName}
                                     maxLength={60}
@@ -598,7 +598,7 @@ const ServiciosScreen = () => {
                                         <TextInput
                                             style={[styles.input, { flex: 1 }]}
                                             placeholder="Minutos"
-                                            placeholderTextColor="#606070"
+                                            placeholderTextColor="#9A9A9A"
                                             keyboardType="numeric"
                                             value={serviceCustomDuration}
                                             onChangeText={setServiceCustomDuration}
@@ -614,7 +614,7 @@ const ServiciosScreen = () => {
                                     <TextInput
                                         style={styles.priceInput}
                                         placeholder="0.00"
-                                        placeholderTextColor="#606070"
+                                        placeholderTextColor="#9A9A9A"
                                         keyboardType="decimal-pad"
                                         value={servicePrice}
                                         onChangeText={setServicePrice}
@@ -660,7 +660,7 @@ const ServiciosScreen = () => {
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Ej: Juan García"
-                                    placeholderTextColor="#606070"
+                                    placeholderTextColor="#9A9A9A"
                                     value={staffName}
                                     onChangeText={setStaffName}
                                     maxLength={60}
@@ -671,7 +671,7 @@ const ServiciosScreen = () => {
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Ej: Peluquero, Colorista..."
-                                    placeholderTextColor="#606070"
+                                    placeholderTextColor="#9A9A9A"
                                     value={staffSpecialty}
                                     onChangeText={setStaffSpecialty}
                                     maxLength={50}

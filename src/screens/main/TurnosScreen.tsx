@@ -568,8 +568,8 @@ const TurnosScreen = ({ navigation }: any) => {
                             style={styles.staffOption}
                             onPress={() => handleAssignStaff(null)}
                         >
-                            <View style={[styles.staffOptionCircle, { backgroundColor: '#3A3A5A' }]}>
-                                <Ionicons name="person-remove-outline" size={20} color="white" />
+                            <View style={[styles.staffOptionCircle, { backgroundColor: '#EDEDEA' }]}>
+                                <Ionicons name="person-remove-outline" size={20} color="#9A9A9A" />
                             </View>
                             <Text style={styles.staffOptionName}>Sin asignar</Text>
                         </TouchableOpacity>
@@ -780,7 +780,7 @@ const TurnosScreen = ({ navigation }: any) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => changeDate(1)} style={styles.navBtn}>
-                    <Ionicons name="chevron-forward" size={24} color="white" />
+                    <Ionicons name="chevron-forward" size={24} color="#1A1A1A" />
                 </TouchableOpacity>
             </View>
 
@@ -836,7 +836,7 @@ const TurnosScreen = ({ navigation }: any) => {
                                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E94560" />}
                                 ListEmptyComponent={
                                     <View style={styles.emptyContainer}>
-                                        <Ionicons name="calendar-outline" size={60} color="#2A2A4A" />
+                                        <Ionicons name="calendar-outline" size={60} color="#DEDEDB" />
                                         <Text style={styles.emptyTitle}>Sin turnos para este día</Text>
                                     </View>
                                 }

@@ -31,7 +31,7 @@ export function PremiumCard({
             {children}
         </LinearGradient>
     ) : (
-        <View style={[cardStyle, { backgroundColor: '#1A1A2E' }]}>
+        <View style={[cardStyle, { backgroundColor: '#FFFFFF' }]}>
             {children}
         </View>
     );
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: 'rgba(108,99,255,0.15)',
+        borderColor: '#DEDEDB',
     },
     elevated: {
         elevation: 0,
