@@ -122,25 +122,27 @@ const TurnosScreen = ({ navigation }: any) => {
             const apps = data as unknown as Appointment[] || [];
             setAppointments(apps);
 
-            // Cargar datos de clientes via RPC para evitar bloqueo de RLS
+            // Cargar datos de clientes via query directa a users
+            // Esto funciona porque la nueva RLS policy permite
+            // que el admin lea clientes de su negocio
             if (apps.length > 0) {
-                const newMap: Record<string, any> = {};
-                await Promise.all(
-                    apps.map(async (app) => {
-                        try {
-                            const { data: clientData } = await supabase
-                                .rpc('get_appointment_client', {
-                                    p_appointment_id: app.id
-                                });
-                            if (clientData && clientData.length > 0) {
-                                newMap[app.client_user_id] = clientData[0];
-                            }
-                        } catch (e) {
-                            console.log('Error cargando cliente:', e);
-                        }
-                    })
-                );
-                setClientsMap(newMap);
+                const clientIds = [
+                    ...new Set(apps.map((a: any) => a.client_user_id).filter(Boolean))
+                ];
+                const { data: clientsData, error: clientsError } = await supabase
+                    .from('users')
+                    .select('id, full_name, email, avatar_url')
+                    .in('id', clientIds);
+
+                if (!clientsError && clientsData) {
+                    const map: Record<string, any> = {};
+                    clientsData.forEach((c: any) => {
+                        map[c.id] = c;
+                    });
+                    setClientsMap(map);
+                } else if (clientsError) {
+                    console.log('Error cargando clientes:', clientsError.message);
+                }
             }
 
             scheduleFutureReminders(apps);
@@ -177,18 +179,20 @@ const TurnosScreen = ({ navigation }: any) => {
 
             if (error || !data) return;
 
-            // Cargar datos del cliente via RPC
-            try {
+            // Cargar cliente separado
+            if ((data as any).client_user_id) {
                 const { data: clientData } = await supabase
-                    .rpc('get_appointment_client', { p_appointment_id: id });
-                if (clientData && clientData.length > 0) {
+                    .from('users')
+                    .select('id, full_name, email, avatar_url')
+                    .eq('id', (data as any).client_user_id)
+                    .single();
+
+                if (clientData) {
                     setClientsMap(prev => ({
                         ...prev,
-                        [data.client_user_id]: clientData[0]
+                        [(data as any).client_user_id]: clientData
                     }));
                 }
-            } catch (e) {
-                console.log('Error cargando cliente por id:', e);
             }
 
             const fechaDelTurno = new Date(data.start_at);
@@ -375,9 +379,10 @@ const TurnosScreen = ({ navigation }: any) => {
         );
     };
 
-    const getClient = useCallback((item: Appointment) => {
-        return clientsMap[item.client_user_id] || null;
-    }, [clientsMap]);
+    const getClient = (item: Appointment) => {
+        const clientId = (item as any).client_user_id;
+        return clientsMap[clientId] || null;
+    };
 
     const renderAppointmentItem = ({ item, index }: { item: Appointment, index: number }) => {
         const isCancelled = item.status === 'cancelled';
@@ -646,10 +651,10 @@ const TurnosScreen = ({ navigation }: any) => {
                             </View>
                             <View style={{ flex: 1, marginLeft: 12 }}>
                                 <Text style={styles.detailValue}>
-                                    {client?.full_name ?? 'Cargando...'}
+                                    {client?.full_name ?? 'Sin nombre'}
                                 </Text>
                                 <Text style={styles.detailSubValue}>
-                                    {client?.email ?? ''}
+                                    {client?.email ?? 'Sin correo'}
                                 </Text>
                             </View>
                             <TouchableOpacity style={styles.copyBtn}>
