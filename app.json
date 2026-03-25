@@ -4,14 +4,14 @@
     "slug": "turnosync-admin",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/icon.png",
     "scheme": "turnosyncadmin",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1A1A2E"
+      "backgroundColor": "#0D0D1A"
     },
     "ios": {
       "supportsTablet": false,
@@ -19,8 +19,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#1A1A2E"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0D0D1A"
       },
       "package": "com.turnosync.admin",
       "edgeToEdgeEnabled": true
@@ -34,16 +34,24 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/icon.png",
-          "color": "#E94560"
+          "icon": "./assets/notification-icon.png",
+          "color": "#C9A84C"
         }
       ],
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#1A1A2E",
-          "image": "./assets/images/splash.png",
-          "imageWidth": 200
+          "backgroundColor": "#0D0D1A",
+          "image": "./assets/splash.png",
+          "imageWidth": 200,
+          "dark": {
+            "backgroundColor": "#0D0D1A",
+            "image": "./assets/splash.png"
+          },
+          "light": {
+            "backgroundColor": "#F5F5F0",
+            "image": "./assets/splash-light.png"
+          }
         }
       ]
     ],
