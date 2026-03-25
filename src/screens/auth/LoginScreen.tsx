@@ -24,7 +24,15 @@ const { width } = Dimensions.get('window');
 
 const LoginScreen = () => {
     const navigation = useNavigation<any>();
-    const { signOut } = useAuth();
+    const { session, signOut } = useAuth();
+
+    if (session) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F5F5F0' }}>
+                <ActivityIndicator size="large" color="#E94560" />
+            </View>
+        );
+    }
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -33,6 +41,13 @@ const LoginScreen = () => {
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     const passwordRef = useRef<TextInput>(null);
+    const isMounted = useRef(true);
+
+    React.useEffect(() => {
+        return () => {
+            isMounted.current = false;
+        };
+    }, []);
 
     // Animaciones nativas
     const headerOpacity = useRef(new NativeAnimated.Value(0)).current;
@@ -85,7 +100,7 @@ const LoginScreen = () => {
         setLoading(true);
 
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const { error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
@@ -98,93 +113,15 @@ const LoginScreen = () => {
                 } else {
                     setErrorMsg('Error al iniciar sesión. Intenta de nuevo.');
                 }
-                setLoading(false);
-                return;
             }
-
-            const user = data.user;
-            if (!user) throw new Error('Usuario no encontrado tras login');
-
-            // 1. Obtener perfil del usuario con manejo robusto
-            const { data: profileFull, error: profileError } = await supabase
-                .from('users')
-                .select('id, full_name, is_superuser')
-                .eq('supabase_auth_uid', user.id)
-                .single();
-
-            if (profileError || !profileFull) {
-                setErrorMsg('No se pudo encontrar el perfil de usuario.');
-                setLoading(false);
-                return;
-            }
-
-            // 2. Si es superuser, permitir acceso directo sin verificar business_users
-            if (profileFull.is_superuser) {
-                console.log('[Login] Superuser detectado, acceso permitido');
-                // El AuthContext se encargará de la navegación via onAuthStateChange
-                return;
-            }
-
-            // 3. Verificar permisos de admin con reintentos (para mitigar lag de RLS)
-            let bizUser = null;
-            let intentos = 0;
-            
-            while (!bizUser && intentos < 3) {
-                intentos++;
-                console.log(`[Login] Verificando permisos, intento ${intentos}...`);
-                
-                const { data, error } = await supabase
-                    .from('business_users')
-                    .select('business_id, role')
-                    .eq('user_id', profileFull.id)
-                    .in('role', ['admin', 'owner'])
-                    .maybeSingle(); // Usar maybeSingle para no lanzar error si no hay resultado
-                
-                if (!error && data) {
-                    bizUser = data;
-                } else if (error) {
-                    console.warn(`[Login] Intento ${intentos} fallido:`, error.message);
-                    // Esperar 500ms antes del siguiente intento si hubo un error de red/RLS
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                } else {
-                    // No hay error pero tampoco datos - el usuario probablemente no tiene permisos
-                    // En el primer intento fallido sin error, esperamos un poco por si es lag de RLS
-                    if (intentos === 1) {
-                        await new Promise(resolve => setTimeout(resolve, 800));
-                    } else {
-                        break; 
-                    }
-                }
-            }
-
-            if (!bizUser) {
-                console.error('[Login] El usuario no tiene permisos de admin tras reintentos');
-                await supabase.auth.signOut();
-                setErrorMsg('Tu cuenta no tiene permisos de administrador.');
-                setLoading(false);
-                return;
-            }
-
-            // 4. Registrar audit log (sin bloquear la entrada)
-            try {
-                await supabase.from('audit_logs').insert({
-                    business_id: bizUser.business_id,
-                    user_id: profileFull.id,
-                    action: 'admin_login',
-                    metadata: {
-                        timestamp: new Date().toISOString(),
-                        platform: 'TurnoSyncAdmin',
-                        device: Platform.OS
-                    }
-                });
-            } catch (auditError) {
-                console.warn('[Login] Audit log falló, ignorando:', auditError);
-            }
+            // Si no hay error, el AuthContext (via onAuthStateChange) manejará la navegación
         } catch (error: any) {
             console.error('Login error:', error);
             setErrorMsg(error.message || 'Ocurrió un error inesperado');
         } finally {
-            setLoading(false);
+            if (isMounted.current) {
+                setLoading(false);
+            }
         }
     };
 
