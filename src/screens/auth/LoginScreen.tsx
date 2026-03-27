@@ -100,7 +100,8 @@ const LoginScreen = () => {
         setLoading(true);
 
         try {
-            const { error } = await supabase.auth.signInWithPassword({
+            // PASO 1: Iniciar sesión con Supabase
+            const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
@@ -113,11 +114,87 @@ const LoginScreen = () => {
                 } else {
                     setErrorMsg('Error al iniciar sesión. Intenta de nuevo.');
                 }
+                setLoading(false);
+                return;
             }
-            // Si no hay error, el AuthContext (via onAuthStateChange) manejará la navegación
+
+            const user = data.user;
+            if (!user) {
+                setLoading(false);
+                return;
+            }
+
+            // PASO 2: Obtener perfil del usuario
+            const { data: profile, error: profileError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('supabase_auth_uid', user.id)
+                .single();
+
+            if (profileError || !profile) {
+                await supabase.auth.signOut();
+                setErrorMsg('No se pudo encontrar el perfil de usuario');
+                setLoading(false);
+                return;
+            }
+
+            // PASO 3: Verificar si es superuser
+            if (profile.is_superuser === true) {
+                // Registro de log para superuser
+                await supabase.from('audit_logs').insert({
+                    user_id: profile.id,
+                    action: 'admin_login_superuser',
+                    metadata: { platform: Platform.OS }
+                }).select().single();
+                
+                return; // Éxito, el AuthContext manejará la sesión activa
+            }
+
+            // PASO 4: Verificar permisos de admin/owner en business_users (Máximo 3 intentos)
+            let hasPermissions = false;
+            for (let i = 0; i < 3; i++) {
+                const { data: permissions, error: permError } = await supabase
+                    .from('business_users')
+                    .select('role')
+                    .eq('user_id', profile.id)
+                    .in('role', ['admin', 'owner']);
+
+                if (!permError && permissions && permissions.length > 0) {
+                    hasPermissions = true;
+                    break;
+                }
+                
+                // Delay de 500ms entre intentos para tolerar lag de RLS
+                if (i < 2) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+
+            if (!hasPermissions) {
+                // LIMPIAR SESIÓN SI NO TIENE PERMISOS
+                await supabase.auth.signOut();
+                setErrorMsg('Tu cuenta no tiene permisos de administrador.');
+                setLoading(false);
+                return;
+            }
+
+            // PASO 5: Registrar audit log de acceso exitoso
+            try {
+                await supabase.from('audit_logs').insert({
+                    user_id: profile.id,
+                    action: 'admin_login_success',
+                    metadata: { platform: Platform.OS }
+                });
+            } catch (e) {
+                console.error('Error recording audit log:', e);
+            }
+
+            // No llamamos setLoading(false) aquí si queremos que la navegación ocurra con el spinner
+            // O podemos llamarlo, el AuthContext reaccionará de todas formas.
         } catch (error: any) {
             console.error('Login error:', error);
             setErrorMsg(error.message || 'Ocurrió un error inesperado');
+            setLoading(false);
         } finally {
             if (isMounted.current) {
                 setLoading(false);
@@ -144,9 +221,6 @@ const LoginScreen = () => {
                                 <View style={styles.checkMark} />
                             </View>
                         </View>
-                        <Text style={styles.appName}>
-                            TurnoSync <Text style={styles.adminTag}>ADMIN</Text>
-                        </Text>
                         <Text style={styles.welcomeTitle}>Bienvenido</Text>
                         <Text style={styles.subtitle}>Panel de administración</Text>
                     </NativeAnimated.View>
@@ -224,13 +298,6 @@ const LoginScreen = () => {
                                 )}
                             </LinearGradient>
                         </TouchableOpacity>
-
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('RecuperarPassword')}
-                            style={styles.forgotButton}
-                        >
-                            <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
-                        </TouchableOpacity>
                     </NativeAnimated.View>
 
                     {/* New User Section */}
@@ -242,20 +309,17 @@ const LoginScreen = () => {
                         </View>
 
                         <TouchableOpacity
-                            style={{ alignItems: 'center', marginTop: 16, paddingVertical: 8 }}
-                            onPress={() => navigation.navigate('Register' as never)}
-                        >
-                            <Text style={{ color: '#A0A0B0', fontSize: 14 }}>
-                                ¿No tenés cuenta?{' '}
-                                <Text style={{ color: '#E94560', fontWeight: '700' }}>Crear cuenta</Text>
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
                             style={styles.subscribeButton}
                             onPress={() => navigation.navigate('Suscripcion')}
                         >
-                            <Text style={styles.subscribeButtonText}>Solicitar suscripción</Text>
+                            <LinearGradient
+                                colors={['#E94560', '#C73652']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={styles.subscribeGradient}
+                            >
+                                <Text style={styles.subscribeButtonText}>Solicitar suscripción</Text>
+                            </LinearGradient>
                         </TouchableOpacity>
                     </NativeAnimated.View>
                 </ScrollView>
@@ -308,17 +372,6 @@ const styles = StyleSheet.create({
         borderColor: '#E94560',
         transform: [{ rotate: '-45deg' }],
         marginTop: 2,
-    },
-    appName: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#1A1A1A',
-        marginBottom: 20,
-    },
-    adminTag: {
-        color: '#E94560',
-        fontSize: 12,
-        fontWeight: '600',
     },
     welcomeTitle: {
         fontSize: 28,
@@ -396,14 +449,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    forgotButton: {
-        marginTop: 16,
-        alignItems: 'center',
-    },
-    forgotText: {
-        color: '#E94560',
-        fontSize: 14,
-    },
     footer: {
         marginTop: 40,
         paddingBottom: 20,
@@ -426,16 +471,18 @@ const styles = StyleSheet.create({
     subscribeButton: {
         height: 52,
         borderRadius: 12,
-        borderWidth: 1,
-        borderColor: '#BCBCBC',
-        justifyContent: 'center',
-        alignItems: 'center',
+        overflow: 'hidden',
         marginTop: 20,
     },
+    subscribeGradient: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     subscribeButtonText: {
-        color: '#5A5A5A',
+        color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: '700',
     },
 });
 

@@ -22,11 +22,12 @@ export default function SplashScreen({ onFinish }: Props) {
     const bgOpacity = useRef(new Animated.Value(0)).current;
     const ringOpacity = useRef(new Animated.Value(0)).current;
     const ringScale = useRef(new Animated.Value(0.7)).current;
+    const ring2Opacity = useRef(new Animated.Value(0)).current;
+    const ring2Scale = useRef(new Animated.Value(0.7)).current;
     const logoScale = useRef(new Animated.Value(0)).current;
     const logoOpacity = useRef(new Animated.Value(0)).current;
     const titleTranslateY = useRef(new Animated.Value(30)).current;
     const titleOpacity = useRef(new Animated.Value(0)).current;
-    const adminOpacity = useRef(new Animated.Value(0)).current;
     const taglineOpacity = useRef(new Animated.Value(0)).current;
     const progressAnim = useRef(new Animated.Value(0)).current;
 
@@ -38,7 +39,7 @@ export default function SplashScreen({ onFinish }: Props) {
             useNativeDriver: true,
         }).start();
 
-        // 2. Círculo exterior (fade + scale)
+        // 2. Círculos exteriores (fade + scale)
         Animated.parallel([
             Animated.timing(ringOpacity, {
                 toValue: 1,
@@ -50,6 +51,19 @@ export default function SplashScreen({ onFinish }: Props) {
                 toValue: 1,
                 duration: 400,
                 delay: 200,
+                useNativeDriver: true,
+            }),
+            // Segundo ring
+            Animated.timing(ring2Opacity, {
+                toValue: 1,
+                duration: 400,
+                delay: 300,
+                useNativeDriver: true,
+            }),
+            Animated.timing(ring2Scale, {
+                toValue: 1,
+                duration: 400,
+                delay: 300,
                 useNativeDriver: true,
             }),
         ]).start();
@@ -87,14 +101,6 @@ export default function SplashScreen({ onFinish }: Props) {
             }),
         ]).start();
 
-        // 5. "ADMIN"
-        Animated.timing(adminOpacity, {
-            toValue: 1,
-            duration: 400,
-            delay: 900,
-            useNativeDriver: true,
-        }).start();
-
         // 6. Tagline
         Animated.timing(taglineOpacity, {
             toValue: 1,
@@ -120,7 +126,7 @@ export default function SplashScreen({ onFinish }: Props) {
 
     const progressWidth = progressAnim.interpolate({
         inputRange: [0, 1],
-        outputRange: [0, 200],
+        outputRange: [0, 240], // Prominent width
     });
 
     return (
@@ -137,7 +143,19 @@ export default function SplashScreen({ onFinish }: Props) {
             </Animated.View>
 
             <View style={styles.content}>
-                {/* ── Círculo exterior pulsante ── */}
+                {/* ── Círculos exteriores pulsantes ── */}
+                <Animated.View
+                    style={[
+                        styles.ring2,
+                        {
+                            opacity: ring2Opacity.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [0, 0.15],
+                            }),
+                            transform: [{ scale: ring2Scale }],
+                        },
+                    ]}
+                />
                 <Animated.View
                     style={[
                         styles.ring,
@@ -164,7 +182,7 @@ export default function SplashScreen({ onFinish }: Props) {
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                     >
-                        <Ionicons name="calendar-outline" size={48} color="#FFFFFF" />
+                        <Ionicons name="calendar-outline" size={64} color="#FFFFFF" />
                     </LinearGradient>
                 </Animated.View>
 
@@ -181,14 +199,9 @@ export default function SplashScreen({ onFinish }: Props) {
                     TurnoSync
                 </Animated.Text>
 
-                {/* ── "ADMIN" ── */}
-                <Animated.Text style={[styles.adminLabel, { opacity: adminOpacity }]}>
-                    ADMIN
-                </Animated.Text>
-
                 {/* ── Tagline ── */}
                 <Animated.Text style={[styles.tagline, { opacity: taglineOpacity }]}>
-                    Gestión profesional de turnos
+                    Reserva tu turno en segundos
                 </Animated.Text>
 
                 {/* ── Barra de progreso ── */}
@@ -218,40 +231,49 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 
-    // Círculo exterior pulsante
+    // Círculos exteriores pulsantes
     ring: {
         position: 'absolute',
-        width: 160,
-        height: 160,
-        borderRadius: 80,
+        width: 220,
+        height: 220,
+        borderRadius: 110,
         borderWidth: 2,
-        borderColor: '#6C63FF',
+        borderColor: '#C9A84C',
         opacity: 0.4,
         // sombra iOS
-        shadowColor: '#6C63FF',
+        shadowColor: '#C9A84C',
         shadowOffset: { width: 0, height: 0 },
         shadowRadius: 20,
         shadowOpacity: 0.5,
+    },
+    ring2: {
+        position: 'absolute',
+        width: 260,
+        height: 260,
+        borderRadius: 130,
+        borderWidth: 1,
+        borderColor: '#C9A84C',
+        alignSelf: 'center',
     },
 
     // Logo
     logoWrapper: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
+        width: 160,
+        height: 160,
+        borderRadius: 80,
         marginBottom: 32,
         // sombra iOS
         shadowColor: '#6C63FF',
         shadowOffset: { width: 0, height: 0 },
-        shadowRadius: 20,
-        shadowOpacity: 0.5,
+        shadowRadius: 30,
+        shadowOpacity: 0.6,
         // elevación Android
-        elevation: 12,
+        elevation: 16,
     },
     logoGradient: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
+        width: 160,
+        height: 160,
+        borderRadius: 80,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -259,17 +281,10 @@ const styles = StyleSheet.create({
     // Textos
     appName: {
         color: '#FFFFFF',
-        fontSize: 34,
+        fontSize: 40,
         fontWeight: 'bold',
-        letterSpacing: 1.5,
+        letterSpacing: 2,
         marginBottom: 6,
-    },
-    adminLabel: {
-        color: '#6C63FF',
-        fontSize: 13,
-        fontWeight: '700',
-        letterSpacing: 8,
-        marginBottom: 16,
     },
     tagline: {
         color: 'rgba(255,255,255,0.45)',
@@ -283,7 +298,7 @@ const styles = StyleSheet.create({
     progressTrack: {
         position: 'absolute',
         bottom: 90,
-        width: 200,
+        width: 240,
         height: 3,
         borderRadius: 2,
         backgroundColor: 'rgba(255,255,255,0.1)',
